@@ -24,9 +24,6 @@ export const fileToBase64 = (file: File): Promise<string> => {
 };
 
 
-
-
-
 // Format file size (bytes → KB/MB)
 export const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + " B";
@@ -34,9 +31,6 @@ export const formatFileSize = (bytes: number) => {
     return (bytes / 1024).toFixed(2) + " KB";
   else return (bytes / (1024 * 1024)).toFixed(2) + " MB";
 };
-
-
-
 
 
 // Check if string is empty

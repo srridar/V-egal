@@ -31,12 +31,9 @@ export const formatChatTime = (date: Date) => {
   const now = new Date();
   const messageDate = new Date(date);
 
-  const isToday =
-    now.toDateString() === messageDate.toDateString();
+  const isToday = now.toDateString() === messageDate.toDateString();
 
-  const isYesterday =
-    new Date(now.setDate(now.getDate() - 1)).toDateString() ===
-    messageDate.toDateString();
+  const isYesterday = new Date(now.setDate(now.getDate() - 1)).toDateString() === messageDate.toDateString();
 
   if (isToday) {
     return formatTime(messageDate);

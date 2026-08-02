@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
-import { setUser, clearUser } from "@/redux/slices/userSlice";
+import { setUser, login, clearError, setLoading, setError } from "@/redux/slices/authSlice";
+import { Toaster, toast } from "sonner";
 
 export default function LoginPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -23,6 +24,12 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        dispatch(clearError());
+        dispatch(setLoading(true));
+
+        const loadingToast = toast.loading("Logging in...");
+
         try {
 
             const res = await fetch("/api/auth/login", {
@@ -30,22 +37,40 @@ export default function LoginPage() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                credentials: "include", 
+                credentials: "include",
                 body: JSON.stringify(form),
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                dispatch(clearUser());
-                throw new Error(data.message);
+                dispatch(setLoading(false));
+                dispatch(setError(data.message));
+
+                toast.error(data.message || "Login failed", {
+                    id: loadingToast,
+                });
+
+                return;
             }
 
-            dispatch(setUser(data.user));
-            router.push(`/profile/${data.userId}`);
+            dispatch(
+                login({
+                    user: data.user,
+                    token: data.token,
+                })
+            );
+ 
+            toast.success("Login successful", {
+                id: loadingToast,
+            });
+            router.push(`/profile`);
 
-        } catch (err) {
+        } catch (err: any) {
             console.error("Login Error:", err);
+            toast.error(err.message || "Something went wrong", {
+                id: loadingToast,
+            });
         }
     };
 

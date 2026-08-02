@@ -14,14 +14,15 @@ const messageSchema = new mongoose.Schema(
         },
         content: {
             type: String,
-            trim: true,
+            default: "",
+            trim: true
         },
-        messageType: {
+        type: {
             type: String,
             enum: ["text", "image", "file", "audio", "video"],
             default: "text",
         },
-        fileUrl: {
+        mediaUrl: {
             type: String,
             default: "",
         },
@@ -60,6 +61,16 @@ const messageSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        reactions: [
+            {
+                user: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User"
+                },
+
+                emoji: String
+            }
+        ],
 
         editedAt: {
             type: Date,

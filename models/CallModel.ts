@@ -1,100 +1,67 @@
 import mongoose from "mongoose";
 
 const callSchema = new mongoose.Schema(
-  {
-    // ✅ Single unique identifier
-    roomId: {
-      type: String,
-      required: true,
-      unique: true,
-      index: true,
+{
+    chat: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Chat",
+        required: true,
     },
 
-    // ✅ Participants (works for both 1-1 and group)
-    participants: [
-      {
+    initiatedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
-      },
-    ],
-
-    // Optional chat reference
-    chat: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Chat",
-      index: true,
-    },
-
-    // Who started call
-    caller: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
     },
 
     callType: {
-      type: String,
-      enum: ["audio", "video"],
-      required: true,
+        type: String,
+        enum: ["audio", "video"],
+        required: true,
     },
 
-    callStatus: {
-      type: String,
-      enum: [
-        "initiated",
-        "ringing",
-        "ongoing",
-        "ended",
-        "missed",
-        "rejected",
-      ],
-      default: "initiated",
-      index: true,
+    callMode: {
+        type: String,
+        enum: ["private", "group"],
+        default: "private",
     },
 
-    startTime: Date,
-    endTime: Date,
-
-    // ✅ computed instead of stored
-    // duration will be calculated dynamically
-
-    isGroupCall: {
-      type: Boolean,
-      default: false,
+    status: {
+        type: String,
+        enum: [
+            "ringing",
+            "connecting",
+            "ongoing",
+            "ended",
+            "missed",
+            "rejected",
+            "cancelled",
+            "failed",
+        ],
+        default: "ringing",
     },
 
-    rejectedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    startedAt: Date,
+
+    endedAt: Date,
+
+    duration: {
+        type: Number,
+        default: 0, // seconds
     },
 
-    endedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    recordingUrl: {
+        type: String,
+        default: "",
     },
 
-    endReason: {
-      type: String,
-      enum: ["ended", "missed", "rejected", "failed"],
+    isRecording: {
+        type: Boolean,
+        default: false,
     },
-  },
-  { timestamps: true }
-);
-
-// ✅ Virtual duration (BEST PRACTICE)
-callSchema.virtual("duration").get(function () {
-  if (this.startTime && this.endTime) {
-    return Math.floor((this.endTime.getTime() - this.startTime.getTime()) / 1000);
-  }
-  return 0;
+},
+{
+    timestamps: true,
 });
 
-// ✅ Index for fast queries
-callSchema.index({ participants: 1 });
-callSchema.index({ createdAt: -1 });
-
-const Call =
-  mongoose.models.Call || mongoose.model("Call", callSchema);
-
-export default Call;
+export default mongoose.models.Call || mongoose.model("Call", callSchema);

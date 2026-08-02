@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
-import { rejectFriendRequest } from "@/services/friendreq.services";
+import { rejectFriendRequest } from "@/services/friendRequest.services";
 import { isAuthenticated } from "@/lib/authGuard";
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await isAuthenticated();
+    const userId = await isAuthenticated(req);
 
     if (!userId) {
       return Response.json(

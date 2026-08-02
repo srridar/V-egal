@@ -1,16 +1,18 @@
 import { NextRequest } from "next/server";
 import { isAuthenticated } from "@/lib/authGuard";
-import { sendFriendRequest } from "@/services/friendreq.services";
+import { sendFriendRequest } from "@/services/friendRequest.services";
+import { connectToDatabase } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
     try {
-        const userId = await isAuthenticated();
+        await connectToDatabase();
+        const userId = await isAuthenticated(req);
         if (!userId) {
             return Response.json({ message: "Unauthorized" }, { status: 401 });
         }
 
         const { receiverId } = await req.json();
-
+  
         if (!receiverId) {
             return Response.json(
                 { message: "receiverId required" },
@@ -28,6 +30,7 @@ export async function POST(req: NextRequest) {
             { status: 200 }
         );
     } catch (error: any) {
+        
         console.error("Error sending friend request:", error);
         return Response.json(
             { message: error.message || "Failed to send request" },

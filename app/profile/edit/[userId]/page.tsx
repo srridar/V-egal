@@ -15,7 +15,7 @@ import {
 import Image from "next/image";
 
 type UserType = {
-    name: string;
+    username: string;
     email: string;
     bio: string;
     avatar: string;
@@ -32,19 +32,23 @@ export default function EditProfilePage() {
     const [user, setUser] = useState<UserType | null>(null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
-    // ✅ Fetch user data
+
     useEffect(() => {
+      
         const fetchUserProfile = async () => {
             try {
-                const response = await fetch(`/api/user/${userId}`, {
+                setInitialLoading(true);
+                const response = await fetch(`/api/auth/profile/${userId}`, {
                     credentials: "include",
                 });
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    setUser(data.user);
+                if (!response.ok) {
+                    console.error("Failed to fetch profile");
+                    return;
                 }
+
+                const data = await response.json();
+                setUser(data.user);
             } catch (error) {
                 console.log("Error fetching profile:", error);
             } finally {
@@ -76,7 +80,7 @@ export default function EditProfilePage() {
         try {
             setLoading(true);
             const form = new FormData();
-            if (user?.name) form.append("name", user.name);
+            if (user?.username) form.append("name", user.username);
             if (user?.bio) form.append("bio", user.bio);
             if (avatarFile) {
                 form.append("avatar", avatarFile);
@@ -88,7 +92,7 @@ export default function EditProfilePage() {
             if (!res.ok) throw new Error(data.message);
 
             if (res.ok) {
-                router.push(`/profile/${userId}`)
+                router.push(`/profile`)
             }
 
         } catch (error: any) {
@@ -191,9 +195,9 @@ export default function EditProfilePage() {
 
                             <input
                                 type="text"
-                                value={user.name || ""}
+                                value={user.username || ""}
                                 onChange={(e) =>
-                                    setUser({ ...user, name: e.target.value })
+                                    setUser({ ...user, username: e.target.value })
                                 }
                                 className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                             />

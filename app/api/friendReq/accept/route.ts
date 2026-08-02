@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
-import { acceptFriendRequest } from "@/services/friendreq.services";
+import { acceptFriendRequest } from "@/services/friendRequest.services";
 import { isAuthenticated } from "@/lib/authGuard";
 
 
 export async function POST(req: NextRequest) {
     try {
-        const userId = await isAuthenticated();
+        const userId = await isAuthenticated(req);
         if (!userId) {
             return Response.json(
                 { message: "Unauthorized" },
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const result = await acceptFriendRequest(requestId, userId);
+        const result = await acceptFriendRequest(requestId, userId);   // this requestId is friendRequest id
 
         return Response.json(
             {

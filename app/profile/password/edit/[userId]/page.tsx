@@ -44,10 +44,8 @@ export default function ChangePasswordPage() {
             });
 
             const data = await res.json();
-
             if (!res.ok) throw new Error(data.message);
-
-            alert("Password updated successfully 🔐");
+            alert("Password updated successfully ");
 
             setForm({
                 currentPassword: "",

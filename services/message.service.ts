@@ -2,7 +2,6 @@
 import Message from "@/models/Message";
 import Chat from "@/models/Chat";
 import { uploadFile } from "@/lib/upload";
-import User from "@/models/User";
 
 
 //  1.                    Send Message (TEXT / FILE)
@@ -10,23 +9,23 @@ import User from "@/models/User";
 export const sendMessage = async (data: { chatId: string, senderId: string, content?: string, file?: string, fileName?: string, messageType: "text" | "image" | "file" | "audio" | "video"; }) => {
 
     const { chatId, senderId, content, file, fileName, messageType } = data;
-
     if (!chatId || !senderId) {
         throw new Error("chatId and senderId required");
     }
-
     const chat = await Chat.findById(chatId);
     if (!chat) throw new Error("Chat not found");
 
-    if (!chat.participants.includes(senderId)) {
+    const isParticipant = chat.participants.some(
+        (id: any) => id.toString() === senderId
+    );
+
+    if (!isParticipant) {
         throw new Error("You are not part of this chat");
     }
-
 
     let fileData: any = {};
 
     //  upload file if exists 
-
     if (file) {
 
         if (!["image", "file", "audio", "video"].includes(messageType)) {
@@ -49,7 +48,6 @@ export const sendMessage = async (data: { chatId: string, senderId: string, cont
         ...fileData,
     });
 
-
     await Chat.findByIdAndUpdate(chatId, {
         latestMessage: message._id,
     });
@@ -69,9 +67,7 @@ export const sendMessage = async (data: { chatId: string, senderId: string, cont
 
 export const getMessages = async (chatId: string, userId: string) => {
     if (!chatId) throw new Error("chatId required");
-
-    const messages = await Message.find({ chat: chatId, deletedFor: { $ne: userId }}).populate("sender", "-password").sort({ createdAt: 1 });
-
+    const messages = await Message.find({ chat: chatId, deletedFor: { $ne: userId } }).populate("sender", "-password").sort({ createdAt: 1 });
     return messages;
 };
 
@@ -85,7 +81,7 @@ export const markMessagesAsSeen = async (chatId: string, userId: string) => {
         {
             chat: chatId,
             sender: { $ne: userId },
-            seenBy: { $ne: userId }, 
+            seenBy: { $ne: userId },
         },
         {
             $addToSet: { seenBy: userId },
@@ -99,7 +95,6 @@ export const markMessagesAsSeen = async (chatId: string, userId: string) => {
 //            4. Delete Message (for everyone)
 export const deleteMessageForEveryone = async (messageId: string, userId: string) => {
     const message = await Message.findById(messageId);
-
     if (!message) throw new Error("Message not found");
 
     if (message.sender.toString() !== userId) {
@@ -107,10 +102,9 @@ export const deleteMessageForEveryone = async (messageId: string, userId: string
     }
 
     const chatId = message.chat;
-
     await Message.findByIdAndDelete(messageId);
 
-    //               fix latest message if needed
+    //            fix latest message if needed
     const lastMessage = await Message.findOne({ chat: chatId }).sort({ createdAt: -1 });
 
     await Chat.findByIdAndUpdate(chatId, {
@@ -123,14 +117,9 @@ export const deleteMessageForEveryone = async (messageId: string, userId: string
 
 
 //           5. Delete Message (for me)
-export const deleteMessageForMe = async (
-    messageId: string,
-    userId: string
-) => {
+export const deleteMessageForMe = async (  messageId: string, userId: string) => {
     const message = await Message.findById(messageId);
-
     if (!message) throw new Error("Message not found");
-
     await Message.findByIdAndUpdate(messageId, {
         $addToSet: { deletedFor: userId },
     });

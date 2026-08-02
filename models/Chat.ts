@@ -2,39 +2,64 @@ import mongoose from "mongoose";
 
 const chatSchema = new mongoose.Schema({
 
-    chatName: {
+    type: {
         type: String,
+        enum: ["private", "group"],
+        default: "private",
+    },
+    participants: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+    ],
+
+    name: {
+        type: String,
+        default: "",
         trim: true,
-        default: "Personal Chat",
     },
-    isGroupChat: {
-        type: Boolean,
-        default: false,
+    avatar: {
+        type: String,
+        default: "",
     },
-    users: [
+    admins: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         },
     ],
-    groupAdmin: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        default: null,
-    },
-    latestMessage: {
+    lastMessage: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Message",
+        default: null,
     },
+    lastMessageAt: {
+        type: Date,
+        default: Date.now,
+    },
+    settings: {
+        onlyAdminsCanSend: {
+            type: Boolean,
+            default: false,
+        },
+
+        onlyAdminsCanEditInfo: {
+            type: Boolean,
+            default: false,
+        },
+    },
+
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
+
     groupDescription: {
         type: String,
         default: "",
         maxlength: 200,
-    },
-
-    groupImage: {
-        type: String,
-        default: "",
     },
 
     pinnedMessage: {
@@ -43,11 +68,12 @@ const chatSchema = new mongoose.Schema({
         default: null,
     },
 
-    isArchived: {
-        type: Boolean,
-        default: false,
-    },
-
+    archivedBy: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ],
     mutedUsers: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -61,8 +87,21 @@ const chatSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
+    inviteLink: {
+        type: String,
+        default: ""
+    },
+    joinApproval: {
+        type: Boolean,
+        default: false
+    },
+    activeCall: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Call",
+        default: null
+    }
 
-},{timestamps: true });
+}, { timestamps: true });
 
 const Chat = mongoose.models.Chat || mongoose.model("Chat", chatSchema);
 

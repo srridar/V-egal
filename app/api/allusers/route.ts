@@ -1,18 +1,22 @@
 import { isAuthenticated } from "@/lib/authGuard";
-import { getAllUsers } from "@/services/contact.services";
+import { getAllUsers } from "@/services/user.service";
+import { NextRequest, NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/db";
 
-export async function GET() {
+export async function GET(req:NextRequest) {
   try {
-    const userId = await isAuthenticated();
+
+    await connectToDatabase();
+    const userId =  isAuthenticated(req);
 
     if (!userId) {
-      return Response.json({ message: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    const allUsers = await getAllUsers(userId);
+    const allUsers = await getAllUsers();
 
-    return Response.json({ allUsers }, { status: 200 });
-  } catch (error: any) {
-    return Response.json(
+    return NextResponse.json( allUsers, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
       { message: "Failed to fetch users" },
       { status: 500 }
     );

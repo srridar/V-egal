@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { changePassword } from "@/services/auth.services";
 import { isAuthenticated } from "@/lib/authGuard";
+import { connectToDatabase } from "@/lib/db";
 
 export async function PUT(req: NextRequest) {
   try {
-    const userId = await isAuthenticated();
+
+    await connectToDatabase();
+    const userId =  isAuthenticated(req);
 
     if (!userId) {
       return NextResponse.json(
@@ -13,9 +16,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-   
     const body = await req.json();
-
     const { currentPassword, newPassword, confirmPassword } = body;
 
     const result = await changePassword(userId, {

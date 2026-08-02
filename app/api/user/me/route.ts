@@ -1,26 +1,17 @@
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 import User from "@/models/User";
+import { isAuthenticated } from "@/lib/authGuard";
+import type { NextRequest } from "next/server";
 
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
-        const token = cookies().get("token")?.value;
-        if (!token) {
+        const userId = await isAuthenticated(req);
+
+        if (!userId) {
             return Response.json(
-                { message: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        const decoded: any = verifyToken(token);
-        const user = await User.findById(decoded.userId).select("-password");
-
-
-
-        if (!user) {
-            return Response.json(
-                { message: "User not found" },
+                { message: "UserId required" },
                 { status: 404 }
             );
         }

@@ -1,12 +1,12 @@
 import { NextRequest } from "next/server";
-import { getParticularFriendRequest } from "@/services/friendreq.services";
+import { getParticularFriendRequest } from "@/services/friendRequest.services";
 import { isAuthenticated } from "@/lib/authGuard";
 
 
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
     try {
-        const userId = await isAuthenticated();
+        const userId = await isAuthenticated(req);
         if (!userId) {
             return Response.json(
                 { message: "Unauthorized" },

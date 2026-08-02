@@ -20,7 +20,7 @@ export default function Button({
   disabled = false,
 }: ButtonProps) {
 
-  // 🎨 Variant styles
+
   const baseStyle = "px-4 py-2 rounded-lg font-medium transition";
 
   const variants = {

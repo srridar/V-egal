@@ -1,69 +1,199 @@
 "use client";
+import { useState } from "react";
 
 import Image from "next/image";
-import { Phone, Video, MoreVertical } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  ArrowLeft,
+  Phone,
+  Video,
+  MoreVertical,
+  Users,
+} from "lucide-react";
+import { useCall } from "@/context/CallProviderContext";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 interface ChatHeaderProps {
-  name: string;
-  status?: string;
-  avatar?: string;
-  chatId?: string;
-  isOnline?: boolean;
+  chat: {
+    _id: string;
+    type: "private" | "group";
+
+    name?: string;
+    avatar?: string;
+
+    receiver?: {
+      _id: string;
+      name: string;
+      username?: string;
+      avatar?: string;
+      isOnline?: boolean;
+      lastSeen?: string;
+    };
+
+    participants?: any[];
+    lastMessage?: any;
+  };
 }
 
-export default function ChatHeader({
-  name,
-  status,
-  avatar,
-  isOnline = false,
-}: ChatHeaderProps) {
-  return (
-    <div className="w-full px-4 py-3 flex items-center justify-between bg-white/5 backdrop-blur-xl border-b border-white/10">
 
+
+export default function ChatHeader({ chat }: ChatHeaderProps) {
+  const router = useRouter();
+
+  const openProfile = () => {
+    if (chat.type === "private" && chat.receiver) {
+      router.push(`/profile/${chat.receiver._id}`);
+    }
+  };
+
+  const displayName =
+    chat.type === "private"
+      ? chat.receiver?.name || "Unknown User"
+      : chat.name || "Unnamed Group";
+
+  const displayAvatar =
+    chat.type === "private"
+      ? chat.receiver?.avatar || "/default-avatar.png"
+      : chat.avatar || "/default-avatar.png";
+
+  const isOnline =
+    chat.type === "private"
+      ? chat.receiver?.isOnline
+      : false;
+
+  const lastSeen =
+    chat.type === "private"
+      ? chat.receiver?.lastSeen
+      : undefined;
+
+
+  const { startAudioCall, startVideoCall } = useCall();
+
+  const currentUser = useSelector(
+    (state: RootState) => state.auth.user
+  );
+
+  const handleAudioCall = () => {
+    if ( chat.type !== "private" ||  !chat.receiver ||  !currentUser ) {
+      return;
+    }
+    startAudioCall({
+      chatId: chat._id,
+      caller: {
+        id: currentUser.id,
+        name: currentUser.name,
+        avatar: currentUser.avatar,
+      },
+      receiver: {
+        id: chat.receiver._id,
+        name: chat.receiver.name,
+        avatar: chat.receiver.avatar,
+      },
+    });
+  };
+
+
+  const handleVideoCall = () => {
+    if (
+      chat.type !== "private" ||
+      !chat.receiver ||
+      !currentUser
+    ) {
+      return;
+    }
+
+    startVideoCall({
+      chatId: chat._id,
+      caller: {
+        id: currentUser.id,
+        name: currentUser.name,
+        avatar: currentUser.avatar,
+      },
+      receiver: {
+        id: chat.receiver._id,
+        name: chat.receiver.name,
+        avatar: chat.receiver.avatar,
+      },
+    });
+  };
+
+
+  return (
+    <header className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-3">
+
+      {/* Left */}
       <div className="flex items-center gap-3">
 
-        <div className="relative w-10 h-10">
+        <button
+          onClick={() => router.push("/chat")}
+          className="rounded-lg p-2 hover:bg-zinc-800 transition md:hidden"
+        >
+          <ArrowLeft size={20} />
+        </button>
+
+        <div
+          onClick={openProfile}
+          className="relative cursor-pointer"
+        >
           <Image
-            src={avatar || "https://i.pravatar.cc/150?img=3"}
-            alt="user"
-            fill
-            className="rounded-full object-cover border border-white/20"
+            src={displayAvatar || "/public/person2.png"}
+            alt={displayName}
+            width={50}
+            height={50}
+            className="h-12 w-12 rounded-full object-cover"
           />
 
-  
-          <span
-            className={`absolute bottom-0 right-0 w-3 h-3 border-2 border-black rounded-full ${
-              isOnline ? "bg-green-400" : "bg-gray-500"
-            }`}
-          />
+          {chat.type === "private" && isOnline && (
+            <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-zinc-950 bg-emerald-500" />
+          )}
         </div>
 
-  
-        <div>
-          <h2 className="text-sm font-semibold">{name}</h2>
-          <p className="text-xs text-gray-400">
-            {status ? status : isOnline ? "Online" : "Offline"}
-          </p>
+        <div
+          onClick={openProfile}
+          className="cursor-pointer"
+        >
+          <h2 className="font-semibold text-teal-500">
+            {displayName}
+          </h2>
+
+          {chat.type === "private" ? (
+            <p className="text-xs text-zinc-400">
+              {isOnline
+                ? "Online"
+                : lastSeen
+                  ? `Last seen ${new Date(lastSeen).toLocaleString()}`
+                  : "Offline"}
+            </p>
+          ) : (
+            <div className="flex items-center gap-1 text-xs text-zinc-400">
+              <Users size={13} />
+              <span>
+                {chat.participants?.length ?? 0} members
+              </span>
+            </div>
+          )}
         </div>
 
       </div>
 
-      <div className="flex items-center gap-4 text-gray-300">
+      {/* Right */}
+      <div className="flex items-center gap-2">
 
-        <button className="p-2 rounded-lg hover:bg-white/10 transition">
-          <Phone size={18} />
+        <button  onClick={handleAudioCall}  className="rounded-lg p-2 transition hover:bg-zinc-800" >
+          <Phone size={20} />
         </button>
 
-        <button className="p-2 rounded-lg hover:bg-white/10 transition">
-          <Video size={18} />
+        <button onClick={handleVideoCall} className="rounded-lg p-2 transition hover:bg-zinc-800">
+          <Video size={20} />
         </button>
 
-        <button className="p-2 rounded-lg hover:bg-white/10 transition">
-          <MoreVertical size={18} />
+        <button className="rounded-lg p-2 transition hover:bg-zinc-800">
+          <MoreVertical size={20} />
         </button>
 
       </div>
 
-    </div>
+    </header>
   );
 }

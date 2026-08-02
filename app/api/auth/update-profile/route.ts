@@ -3,10 +3,12 @@ import { updateProfile } from "@/services/auth.services";
 import { isAuthenticated } from "@/lib/authGuard";
 import { uploadFile, deleteFile } from "@/lib/upload";
 import User from "@/models/User";
+import { connectToDatabase } from "@/lib/db";
 
 export async function PUT(req: NextRequest) {
   try {
-    const userId = await isAuthenticated();
+    await connectToDatabase();
+    const userId = isAuthenticated(req);
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }

@@ -3,12 +3,9 @@ import User from "@/models/User";
 import FriendRequest from "@/models/FriendRequest";
 import { isAuthenticated } from "@/lib/authGuard";
 
-export async function GET(
-  req: NextRequest,
-  context: { params: Promise<{ userId: string }> }
-) {
+export async function GET( req: NextRequest, context: { params: Promise<{ userId: string }> }) {
   try {
-    const currentUserId = await isAuthenticated();
+    const currentUserId = isAuthenticated(req);
 
     if (!currentUserId) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });

@@ -1,21 +1,18 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { registerUser } from '../../../../services/auth.services';
 import { cookies } from "next/headers";
 import { connectToDatabase } from "@/lib/db";
 
 
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
 
     await connectToDatabase();
     console.log("Connected to database successfully");
 
-
     const body = await req.json();
-
-    console.log("Received registration data:", body);
     const result = await registerUser(body);
-
     const cookieStore = await cookies();
 
     cookieStore.set("token", result.token!, {
@@ -26,8 +23,7 @@ export async function POST(req: Request) {
       path: "/",
     });
 
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: result.message,
         user: result.user,
@@ -35,7 +31,7 @@ export async function POST(req: Request) {
       { status: result.status }
     );
   } catch (error: any) {
-    return Response.json(
+    return NextResponse.json(
       { message: error.message || "Registration failed" },
       { status: 400 }
     );

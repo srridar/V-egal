@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 
 
 export const createCall = async (caller: string, receiver: string, type: "audio" | "video") => {                     //  to create a call
-
     try {
         if (!caller || !receiver) {
             throw new Error("Caller and receiver are required");
@@ -154,3 +153,13 @@ export const rejectCall = async (roomId: string, rejectedBy: string) => {
     throw new Error(error.message || "Failed to reject call");
   }
 };
+
+
+
+
+
+//        Architecture
+
+//              WebRTC → Sends audio/video directly between browsers.
+//              Socket.IO → Exchanges signaling messages (offer, answer, ICE candidates).
+//              STUN/TURN server → Helps peers connect through NAT/firewalls.

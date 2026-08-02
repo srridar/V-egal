@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
-import { cancelFriendRequest } from "@/services/friendreq.services";
+import { cancelFriendRequest } from "@/services/friendRequest.services";
 import { isAuthenticated } from "@/lib/authGuard";
 
 export async function DELETE(req: NextRequest) {
   try {
 
-    const userId = await isAuthenticated();
+    const userId = await isAuthenticated(req);
 
     if (!userId) {
       return Response.json(
@@ -15,7 +15,6 @@ export async function DELETE(req: NextRequest) {
     }
 
     const { requestId } = await req.json();
-
 
     if (!requestId) {
       return Response.json(

@@ -1,14 +1,15 @@
 import { isAuthenticated } from "@/lib/authGuard";
-import { fetchCurrentUser  } from "@/services/auth.services";
+import { getUserProfile  } from "@/services/auth.services";
+import { NextRequest } from "next/server";
 
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const userId = await isAuthenticated();
+    const userId = await isAuthenticated(req);
     if (!userId) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
     }
-    const user = await fetchCurrentUser(userId);
+    const user = await getUserProfile(userId);
 
     return Response.json({ currentUser: user }, { status: 200 });
   } catch (error: any) {

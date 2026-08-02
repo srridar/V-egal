@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
-import { setUser, clearUser } from "@/redux/slices/userSlice";
+import { setUser } from "@/redux/slices/authSlice";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -34,34 +35,30 @@ export default function RegisterPage() {
                 },
                 body: JSON.stringify(form),
             });
-
             const data = await res.json();
-
             if (!res.ok) {
-                throw new Error(data.message);
-            }
-
-            if (!res.ok) {
-                dispatch(clearUser());
-                throw new Error(data.message);
+                throw new Error(data.message || "Registration failed");
             }
 
             dispatch(setUser(data.user));
             router.push("/chat");
 
-        } catch (error) {
+            toast.success("Account created successfully");
+
+        } catch (error: any) {
             console.error("Registration error:", error);
+            toast.error("Registration Failed !" + error.message);
         }
     };
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center relative overflow-hidden ">
 
-    
+
             <div className="absolute inset-0 bg-linear-to-br from-yellow-500/20 via-green-500/20 to-blue-500/20 blur-3xl opacity-50"></div>
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
 
-        
+
             <div className="relative z-10 w-full max-w-md p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
 
                 <h1 className="text-3xl font-bold font-serif  text-center mb-2 bg-linear-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">

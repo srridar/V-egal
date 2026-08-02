@@ -1,22 +1,23 @@
-// app/(chat)/layout.tsx
-
 import ChatSidebar from "@/components/chat/ChatSidebar";
 
-export default function ChatLayout({ children, }: { children: React.ReactNode; }) {
+export default function ChatLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex h-[100dvh] overflow-hidden ">
+    <div className="relative flex h-screen overflow-hidden bg-black text-white">
 
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-
-      <div className="hidden md:block  border-r shrink-0">
+      <aside className="hidden w-[360px] shrink-0 border-r border-zinc-800 md:block ">
         <ChatSidebar />
-      </div>
+      </aside>
 
-      <div className="flex-1 flex flex-col  ">
+      <main className="flex flex-1 flex-col">
         {children}
-      </div>
-
+      </main>
     </div>
   );
 }
+

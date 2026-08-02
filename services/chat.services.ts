@@ -1,6 +1,5 @@
 import Chat from "@/models/Chat";
-import User from "@/models/User";
-
+import "@/models/Message";
 
 //       create or get a chat between two users 1-1 
 
@@ -9,39 +8,119 @@ export const accessChat = async (userId: string, targetUserId: string) => {
         throw new Error("Target userId is required");
     }
 
-    // 1. Check existing chat
+    if (userId === targetUserId) {
+        throw new Error("You cannot create a chat with yourself.");
+    }
+
+    // Find existing private chat
     let chat = await Chat.findOne({
-        isGroupChat: false,
-        users: { $all: [userId, targetUserId] },
+        type: "private",
+        participants: {
+            $all: [userId, targetUserId],
+            $size: 2,
+        },
     })
-        .populate("users", "-password")
-        .populate("latestMessage");
+        .populate("participants", "-password")
+        .populate({
+            path: "lastMessage",
+            populate: {
+                path: "sender",
+                select: "name username avatar",
+            },
+        });
 
     if (chat) {
         return chat;
     }
 
-    // 2. Create new chat
+    // Create new private chat
     const newChat = await Chat.create({
-        chatName: "private",
-        isGroupChat: false,
-        users: [userId, targetUserId],
+        type: "private",
+        participants: [userId, targetUserId],
+        createdBy: userId,
     });
 
-    // 3. Return populated chat
-    chat = await Chat.findById(newChat._id).populate("users", "-password");
+    chat = await Chat.findById(newChat._id)
+        .populate("participants", "-password")
+        .populate({
+            path: "lastMessage",
+            populate: {
+                path: "sender",
+                select: "name username avatar",
+            },
+        });
 
     return chat;
 };
 
 
 
+export const getChatById = async (chatId: string, userId: string) => {
+    if (!chatId || !userId) {
+        throw new Error("chatId and userId are required");
+    }
 
+    const chat = await Chat.findOne({
+        _id: chatId,
+        participants: userId,
+    }).populate(
+            "participants",
+            "name username avatar isOnline lastSeen"
+        )
+        .populate({
+            path: "lastMessage",
+            populate: {
+                path: "sender",
+                select: "name username avatar",
+            },
+        });
+
+    if (!chat) {
+        throw new Error("Chat not found or access denied");
+    }
+
+    const response: any = {
+        _id: chat._id,
+        type: chat.type,
+        lastMessage: chat.lastMessage,
+    };
+
+    if (chat.type === "private") {
+        const receiverDoc = chat.participants.find(
+            (participant: any) =>
+                String(participant._id) !== String(userId)
+        );
+
+        if (!receiverDoc) {
+            throw new Error("Receiver not found");
+        }
+
+        const receiver = receiverDoc.toObject
+            ? receiverDoc.toObject()
+            : receiverDoc;
+
+        response.receiver = {
+            _id: String(receiver._id),
+            name: receiver.name ?? "",
+            username: receiver.username ?? "",
+            avatar: receiver.avatar ?? "",
+            isOnline: receiver.isOnline ?? false,
+            lastSeen: receiver.lastSeen ?? null,
+        };
+
+        console.log("Receiver:", response.receiver);
+    } else {
+        response.name = chat.name;
+        response.avatar = chat.avatar;
+        response.admins = chat.admins;
+        response.participants = chat.participants;
+    }
+
+    return response;
+};
 
 
 //        2. Create Group Chat
-
-
 
 export const createGroupChat = async (data: { name: string; users: string[]; adminId: string }) => {
     const { name, users, adminId } = data;
@@ -65,10 +144,7 @@ export const createGroupChat = async (data: { name: string; users: string[]; adm
 
 
 
-
 //       3. Get all chats of a user
-
-
 export const getUserChats = async (userId: string) => {
     const chats = await Chat.find({ users: { $elemMatch: { $eq: userId } } })
         .populate("users", "-password")
@@ -98,7 +174,6 @@ export const renameGroup = async (chatId: string, newName: string) => {
 }
 
 
-
 //       5. Add user to group chat
 
 export const addToGroup = async (chatId: string, userId: string) => {
@@ -116,7 +191,6 @@ export const addToGroup = async (chatId: string, userId: string) => {
 }
 
 
-
 //       6. Remove user from group chat
 
 export const removeUserFromGroup = async (chatId: string, userId: string) => {
@@ -131,5 +205,4 @@ export const removeUserFromGroup = async (chatId: string, userId: string) => {
     }
 
     return updatedChat;
-
 }

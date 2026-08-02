@@ -46,14 +46,8 @@ export const getYourContacts = async (userId: string) => {
 
 export const addToYourContacts = async (userId: string, contactId: string) => {
 
-    console.log("i reach in service ");
     const user = await User.findById(userId);
-
-    console.log("user is fetched : " + user);
-
     const contact = await User.findById(contactId);
-
-    console.log("contact user data is fetched : " + contact);
 
     if (!user || !contact) {
         throw new Error("User not found");
@@ -62,7 +56,6 @@ export const addToYourContacts = async (userId: string, contactId: string) => {
         throw new Error("Already in contacts");
     }
 
-    console.log("i reach at the end of the  program ");
     user.contacts.push(contactId);
     await user.save();
     return user.contacts;
