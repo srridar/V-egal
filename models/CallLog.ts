@@ -6,22 +6,18 @@ const callLogSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
-
     receiver: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
-
     chat: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Chat",
     },
-
     type: {
         type: String,
         enum: ["audio", "video"],
     },
-
     status: {
         type: String,
         enum: [

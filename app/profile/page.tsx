@@ -122,13 +122,13 @@ export default function ProfilePage() {
           <div className="flex gap-5 justify-between items-center">
             <button
               onClick={() => router.push("/people")}
-              className="group flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl"
+              className="group flex items-center gap-2 px-5 py-2.5 text-gray-700 bg-white hover:bg-white/10  rounded-[5px] transition-all hover:scale-105 active:scale-95 shadow-xl"
             >
-              <Users className="text-teal-400 group-hover:rotate-12 transition-transform" size={18} />
+              <Users className="text-gray-700 group-hover:rotate-2 transition-transform" size={18} />
               <span className="text-sm font-medium tracking-wide">Friends</span>
             </button>  <button
               onClick={() => router.push("/chat")}
-              className="group flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl"
+              className="group flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-black rounded-[5px] transition-all hover:scale-105 active:scale-95 shadow-xl"
             >
               <MessageCircle className="text-teal-400 group-hover:rotate-12 transition-transform" size={18} />
               <span className="text-sm font-medium tracking-wide">MESSAGES</span>
