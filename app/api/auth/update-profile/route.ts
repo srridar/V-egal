@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateProfile } from "@/services/auth.services";
 import { isAuthenticated } from "@/lib/authGuard";
-import { uploadFile, deleteFile } from "@/lib/upload";
+import { uploadFile } from "@/lib/upload";
+import { deleteFile } from "@/lib/deleteFile";
 import User from "@/models/User";
 import { connectToDatabase } from "@/lib/db";
 
