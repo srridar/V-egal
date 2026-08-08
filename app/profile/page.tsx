@@ -13,7 +13,6 @@ import {
   MessageCircle,
   Key,
   Camera,
-  Settings,
   ArrowRight,
 } from "lucide-react";
 import Image from "next/image";
@@ -29,17 +28,6 @@ type UserType = {
   status: string;
 };
 
-type FriendRequestType = {
-  id: string;
-  sender: {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-  };
-
-};
-
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -50,8 +38,6 @@ export default function ProfilePage() {
 
   const [user, setUser] = useState<UserType | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [requestLoading, setRequestLoading] = useState(true);
-
 
   const fetchUserProfile = async () => {
     try {
@@ -74,29 +60,7 @@ export default function ProfilePage() {
     }
   };
 
-  const getAllFriendRequest = async () => {
-    try {
-      setRequestLoading(true);
-
-      const response = await fetch("/api/friendReq/getall", {
-        credentials: "include",
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        console.error("Failed to fetch requests");
-        return;
-      }
-      setFriendReq(result.data.requests || []);
-
-    } catch (error) {
-      console.log("Error fetching requests:", error);
-    } finally {
-      setRequestLoading(false);
-    }
-  };
-
+ 
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", {
@@ -117,7 +81,6 @@ export default function ProfilePage() {
     if (userId) {
       console.log("calling fetchUserProfile");
       fetchUserProfile();
-      getAllFriendRequest();
     }
   }, [userId]);
 

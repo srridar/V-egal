@@ -115,8 +115,7 @@ export const getCallHistory = async (userId: string) => {
 
         const calls = await Call.find({
             participants: { $in: [userId] },
-        })
-            .populate("caller", "name avatar")
+        }) .populate("caller", "name avatar")
             .populate("participants", "name avatar")
             .sort({ createdAt: -1 });
 

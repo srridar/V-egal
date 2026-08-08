@@ -1,9 +1,7 @@
 import { createContext, useState, useRef, useEffect, useContext } from "react";
 import { CallContextType, User, IncomingCall, CallType, CallStatus } from "@/types/call";
-import { getSocket } from "@/socket/client/socket";
-import type { Socket } from "socket.io-client";
-import { SOCKET_EVENTS } from "@/socket/client/socketEvent";
-
+import { SOCKET_EVENTS } from "@/socket/socketEvents";
+import { useSocket } from "@/app/SocketProvider";
 
 export interface StartCallParams {
   chatId: string;
@@ -11,11 +9,11 @@ export interface StartCallParams {
   receiver: User;
 }
 
-
 const CallContext = createContext<CallContextType | null>(null);
 
 export function CallProvider({ children }: { children: React.ReactNode; }) {
 
+  const { socket } = useSocket();
   const [callStatus, setCallStatus] = useState<CallStatus>("idle");
   const [callType, setCallType] = useState<CallType>("audio");
   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
@@ -25,7 +23,6 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
   const [isMuted, setMuted] = useState(false);
   const [isCameraOff, setCameraOff] = useState(false);
   const [speakerOn, setSpeakerOn] = useState(true);
-  const socketRef = useRef<Socket | null>(null);
   const peerRef = useRef<RTCPeerConnection | null>(null);
 
   async function createLocalStream(type: CallType) {
@@ -36,7 +33,6 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
     setLocalStream(stream);
     return stream;
   }
-
 
   async function createPeer(type: CallType) {
 
@@ -67,7 +63,7 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
     peer.onicecandidate = (event) => {         //  this code sets up an event listener for the onicecandidate event of the peer connection. When a new ICE candidate is generated (which helps establish the connection), this event is triggered, and the candidate is sent to the remote peer via the socket connection.
       if (!event.candidate || !outgoingUser) return;
 
-      socketRef.current?.emit("ice-candidate", {
+      socket?.emit("ice-candidate", {
         candidate: event.candidate,
         receiverId: outgoingUser.id,
       });
@@ -100,37 +96,26 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
     return peer;
   }
 
-
   async function startAudioCall({ chatId, caller, receiver, }: StartCallParams) {
     try {
       setOutgoingUser(receiver);         // noting happending till now only react state is updated
       setCallType("audio");              // noting happending till now only react state is updated saying it is audio call
       setCallStatus("calling");
 
-
-      const peer = await createPeer("audio");       //  exection leaves this function and goes to createPeer function and creates a peer connection and returns it
+      const peer = await createPeer("audio");   //  exection leaves this function and goes to createPeer function and creates a peer connection and returns it
 
       //  till now 
-      //       peer = RTCPeerConnection
 
-      // ✓ Microphone attached
-      // ✓ Event listeners registered
-      // ✓ Local stream created
-
-      // ❌ No connection yet
-      // ❌ Receiver doesn't know anything yet
-      // ❌ Server doesn't know anything yet
-
+      // ✓ Microphone attached       // ✓ Event listeners registered        // ✓ Local stream created
+      // ❌ No connection yet        // ❌ Receiver doesn't know anything yet      // ❌ Server doesn't know anything yet
 
 
       const offer = await peer.createOffer();       // The browser generates an SDP (Session Description Protocol) offer, which describes the media capabilities and preferences of the caller. This offer will be sent to the receiver to initiate the call.
 
-      //       The browser creates an SDP (Session Description Protocol) offer.
+      //  The browser creates an SDP (Session Description Protocol) offer.
 
-      // Think of it like introducing yourself before making a phone call.
-
+      // Think of it like introducing yourself before making a phone call. 
       // The browser asks itself:
-
       // What media do I want to send?
       // Audio only or video too?
       // Which codecs do I support?
@@ -139,13 +124,9 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
 
       // Then it creates a large text description.
 
+      await peer.setLocalDescription(offer);    // This means that the caller is now ready to send its media capabilities to the receiver. It tells the browser:
 
-
-      await peer.setLocalDescription(offer);    // The generated offer is set as the local description of the peer connection. This means that the caller is now ready to send its media capabilities to the receiver. It tells the browser:
-
-      //  "This offer is now officially my offer."
-
-      socketRef.current?.emit(SOCKET_EVENTS.CALL_INCOMING, {             // This is the first moment your application talks to the server.Everything before this happened only inside the caller's browser.
+      socket?.emit(SOCKET_EVENTS.CALL_INCOMING, {             // This is the first moment your application talks to the server.Everything before this happened only inside the caller's browser.
         roomId: chatId,
         caller,
         receiver,
@@ -153,11 +134,12 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
         offer,
       });
 
+  
+
     } catch (err) {
       console.error(err);
     }
   }
-
 
   async function startVideoCall({ chatId, caller, receiver, }: StartCallParams) {
     try {
@@ -166,18 +148,18 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
       setCallStatus("calling");
 
       const peer = await createPeer("video");
-
       const offer = await peer.createOffer();
-
       await peer.setLocalDescription(offer);
 
-      socketRef.current?.emit(SOCKET_EVENTS.CALL_INCOMING, {
+      socket?.emit(SOCKET_EVENTS.CALL_INCOMING, {
         roomId: chatId,
         caller,
         receiver,
         type: "video",
         offer,
       });
+
+       console.log("Outgoing Video call offer sent to server:", offer);
 
     } catch (err) {
       console.error(err);
@@ -195,34 +177,57 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
     if (!incomingCall) return;
 
     const peer = await createPeer(incomingCall.type);
-    await peer.setRemoteDescription(incomingCall.offer);
+    await peer.setRemoteDescription(
+      new RTCSessionDescription(incomingCall.offer)
+    );
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer);
-
-    socketRef.current?.emit(SOCKET_EVENTS.CALL_ACCEPTED, {
-      answer,
+    socket?.emit(SOCKET_EVENTS.CALL_ACCEPTED, {
+      roomId: incomingCall.roomId,
       receiverId: incomingCall.caller.id,
+      answer,
     });
 
-    setIncomingCall(null);
     setCallStatus("connecting");
-  }
-
-  function rejectCall() {
-    if (incomingCall) {
-      socketRef.current?.emit(SOCKET_EVENTS.CALL_REJECTED, {
-        receiverId: incomingCall.caller.id,
-      });
-    }
-
     setIncomingCall(null);
-    setCallStatus("idle");
   }
+
+  const rejectCall = () => {
+    if (!incomingCall || !socket) return;
+
+    socket.emit(SOCKET_EVENTS.CALL_REJECTED, {
+      receiverId: incomingCall.caller.id, 
+    });
+
+    // Stop local ringing
+    setIncomingCall(null);
+
+    // Reset call state
+    setOutgoingUser(null);
+    setCallStatus("idle");
+    setCallType(null);
+
+    // Cleanup streams if they exist
+    localStream?.getTracks().forEach(track => track.stop());
+    remoteStream?.getTracks().forEach(track => track.stop());
+
+    setLocalStream(null);
+    setRemoteStream(null);
+
+    // Close peer connection
+    if (peerRef.current) {
+      peerRef.current.close();
+      peerRef.current = null;
+    }
+  };
 
   function endCall() {
-    socketRef.current?.emit(SOCKET_EVENTS.CALL_ENDED, {
-      receiverId: outgoingUser?.id,
-    });
+
+    if (incomingCall) {
+      socket?.emit(SOCKET_EVENTS.CALL_ENDED, {
+        roomId: incomingCall.roomId,
+      });
+    }
 
     peerRef.current?.close();
     peerRef.current = null;
@@ -265,11 +270,8 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
     setSpeakerOn((prev) => !prev);
   }
 
-  // Socket listeners
-  useEffect(() => {
-    socketRef.current = getSocket();
-    const activeSocket = socketRef?.current;
-    if (!activeSocket) return;
+  useEffect(() => {                    // Socket listeners
+    if (!socket) return;
 
     // 1. Handle incoming call offer from another user
     const handleIncomingCall = (data: IncomingCall) => {
@@ -277,9 +279,7 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
     };
 
     // 2. Caller receives the answer from the receiver
-    const handleCallAnswered = async ({ answer }: {
-      answer: RTCSessionDescriptionInit;
-    }) => {
+    const handleCallAnswered = async ({ answer }: {  answer: RTCSessionDescriptionInit}) => {
       if (peerRef.current) {
         try {
           await peerRef.current.setRemoteDescription(
@@ -292,14 +292,10 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
     };
 
     // 3. Handle incoming ICE candidates
-    const handleIceCandidate = async ({
-      candidate,
-    }: {
-      candidate: RTCIceCandidateInit;
-    }) => {
+    const handleIceCandidate = async ({ candidate }: { candidate: RTCIceCandidateInit }) => {
       if (peerRef.current && candidate) {
         try {
-          await peerRef.current.addIceCandidate(
+            await peerRef.current.addIceCandidate(
             new RTCIceCandidate(candidate)
           );
         } catch (err) {
@@ -319,22 +315,21 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
     };
 
     // Attach listeners
-    activeSocket.on(SOCKET_EVENTS.CALL_INCOMING, handleIncomingCall);
-    activeSocket.on(SOCKET_EVENTS.CALL_ACCEPTED, handleCallAnswered);
-    activeSocket.on(SOCKET_EVENTS.ICE_CANDIDATE, handleIceCandidate);
-    activeSocket.on(SOCKET_EVENTS.CALL_REJECTED, handleCallRejected);
-    activeSocket.on(SOCKET_EVENTS.CALL_ENDED, handleCallEnded);
+    socket.on(SOCKET_EVENTS.CALL_INCOMING, handleIncomingCall);
+    socket.on(SOCKET_EVENTS.CALL_ACCEPTED, handleCallAnswered);
+    socket.on(SOCKET_EVENTS.ICE_CANDIDATE, handleIceCandidate);
+    socket.on(SOCKET_EVENTS.CALL_REJECTED, handleCallRejected);
+    socket.on(SOCKET_EVENTS.CALL_ENDED, handleCallEnded);
 
     // Clean up event listeners on unmount
     return () => {
-      activeSocket.off(SOCKET_EVENTS.CALL_INCOMING, handleIncomingCall);
-      activeSocket.off(SOCKET_EVENTS.CALL_ACCEPTED, handleCallAnswered);
-      activeSocket.off(SOCKET_EVENTS.ICE_CANDIDATE, handleIceCandidate);
-      activeSocket.off(SOCKET_EVENTS.CALL_REJECTED, handleCallRejected);
-      activeSocket.off(SOCKET_EVENTS.CALL_ENDED, handleCallEnded);
+      socket.off(SOCKET_EVENTS.CALL_INCOMING, handleIncomingCall);
+      socket.off(SOCKET_EVENTS.CALL_ACCEPTED, handleCallAnswered);
+      socket.off(SOCKET_EVENTS.ICE_CANDIDATE, handleIceCandidate);
+      socket.off(SOCKET_EVENTS.CALL_REJECTED, handleCallRejected);
+      socket.off(SOCKET_EVENTS.CALL_ENDED, handleCallEnded);
     };
-  }, []);
-
+  }, [socket]);
 
 
   return (
@@ -377,3 +372,16 @@ export function useCall() {
 
   return context;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

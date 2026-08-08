@@ -108,16 +108,15 @@ export default function ChatSidebar() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          targetUserId: id,
+          targetUserId: id,      //   this stores the id of the user to whom we want to send a message
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json();     // stores the chat data returned from the server in the data variable between these two users
 
       if (!res.ok) {
         throw new Error(data.message);
       }
-
       router.push(`/chat/${data.chat._id}`);
     } catch (err) {
       console.error(err);
@@ -283,14 +282,14 @@ export default function ChatSidebar() {
                 {isFriend(user._id) ? (
                   <Button
                     className="font-mono bg-violet-700"
-                    onClick={() => messageHandler(user._id)}
+                    onClick={() => messageHandler(user?._id)}
                   >
                     Chat
                   </Button>
                 ) : (
                   <Button
                     className="font-mono bg-blue-500"
-                    onClick={() => handleAddFrined(user._id)}
+                    onClick={() => handleAddFrined(user?._id)}
                   >
                     Add Friend
                   </Button>

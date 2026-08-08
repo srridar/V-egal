@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -96,10 +95,7 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
 
   const handleVideoCall = () => {
     if (
-      chat.type !== "private" ||
-      !chat.receiver ||
-      !currentUser
-    ) {
+      chat.type !== "private" || !chat.receiver ||!currentUser) {
       return;
     }
 
@@ -121,10 +117,7 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
 
   return (
     <header className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-3">
-
-      {/* Left */}
       <div className="flex items-center gap-3">
-
         <button
           onClick={() => router.push("/chat")}
           className="rounded-lg p-2 hover:bg-zinc-800 transition md:hidden"
@@ -177,7 +170,6 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
 
       </div>
 
-      {/* Right */}
       <div className="flex items-center gap-2">
 
         <button  onClick={handleAudioCall}  className="rounded-lg p-2 transition hover:bg-zinc-800" >

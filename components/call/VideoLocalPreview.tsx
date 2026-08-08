@@ -51,7 +51,7 @@ export default function VideoLocalPreview({
         <div className="flex h-full w-full flex-col items-center justify-center gap-3">
 
           <Image
-            src={user.avatar || "/default-avatar.png"}
+            src={user.avatar || "/public/person2.png"}
             alt={user.name}
             width={60}
             height={60}
@@ -66,7 +66,6 @@ export default function VideoLocalPreview({
         </div>
       )}
 
-      {/* Self badge */}
       <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">
         You
       </div>

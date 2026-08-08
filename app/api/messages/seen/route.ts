@@ -4,7 +4,7 @@ import { isAuthenticated } from "@/lib/authGuard";
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await isAuthenticated();
+    const userId = await isAuthenticated(req);
 
     if (!userId) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });

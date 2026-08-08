@@ -14,8 +14,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ chat
       );
     }
     const { chatId } = await params;
-    console.log("chatId:", chatId);
-
+  
     if (!chatId) {
       return Response.json(
         { message: "chatId is required" },

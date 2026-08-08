@@ -108,7 +108,6 @@ export const getChatById = async (chatId: string, userId: string) => {
             lastSeen: receiver.lastSeen ?? null,
         };
 
-        console.log("Receiver:", response.receiver);
     } else {
         response.name = chat.name;
         response.avatar = chat.avatar;
@@ -136,9 +135,7 @@ export const createGroupChat = async (data: { name: string; users: string[]; adm
         groupAdmin: adminId,
     });
 
-    return await Chat.findById(groupChat._id)
-        .populate("users", "-password")
-        .populate("groupAdmin", "-password");
+    return await Chat.findById(groupChat._id).populate("users", "-password").populate("groupAdmin", "-password");
 
 }
 

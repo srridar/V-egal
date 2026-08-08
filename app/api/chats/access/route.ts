@@ -13,23 +13,20 @@ export async function POST(req: NextRequest) {
                     success: false,
                     message: "Unauthorized",
                 },
-                {
-                    status: 401,
-                }
+                {  status: 401, }
             );
         }
 
         const { targetUserId } = await req.json();
-        const chat = await accessChat(userId, targetUserId);
+        const chat = await accessChat(userId, targetUserId);   
+        console.log("Chat fetched successfully:", chat);
         return NextResponse.json(
             {
                 success: true,
                 message: "Chat fetched successfully",
                 chat,
             },
-            {
-                status: 200,
-            }
+            {   status: 200 }
         );
     } catch (error: any) {
         return NextResponse.json(
@@ -37,9 +34,7 @@ export async function POST(req: NextRequest) {
                 success: false,
                 message: error.message,
             },
-            {
-                status: 500,
-            }
+            { status: 500 }  
         );
     }
 }

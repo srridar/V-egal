@@ -30,7 +30,6 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
         (state: RootState) => state.auth.user
     );
 
-
     const fetchMessages = async () => {
         try {
             setLoading(true);
@@ -54,20 +53,27 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
         if (!chatId) return;
 
         joinRoom(chatId);
-
         setMessages([]);
         fetchMessages();
 
         return () => {
             leaveRoom();
-        };
+        };              
     }, [chatId]);
+
+
+    useEffect(() => {
+        console.log("ChatWindow Mounted");
+
+        return () => {
+            console.log("ChatWindow Unmounted");
+        };
+    }, []);
 
 
     useEffect(() => {
         const receiveMessage = (message: Message & { tempId?: string }) => {
             setMessages((prev) => {
-                // Replace optimistic message
                 if (message.tempId) {
                     const exists = prev.find((m) => m._id === message.tempId);
 
@@ -78,7 +84,6 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
                     }
                 }
 
-                // Prevent duplicate server messages
                 const alreadyExists = prev.some(
                     (m) => m._id === message._id
                 );
@@ -102,24 +107,15 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
             toast.error(error.message);
         };
 
-        onEvent(
-            SOCKET_EVENTS.MESSAGE_ERROR,
-            handleMessageError
-        );
-
+        onEvent(SOCKET_EVENTS.MESSAGE_ERROR, handleMessageError);
         return () => {
-            offEvent(
-                SOCKET_EVENTS.MESSAGE_ERROR,
-                handleMessageError
-            );
+            offEvent(SOCKET_EVENTS.MESSAGE_ERROR, handleMessageError);
         };
 
     }, []);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({
-            behavior: "smooth",
-        });
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
 
@@ -142,11 +138,6 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
         setMessages((prev) => [...prev, optimisticMessage]);
 
         try {
-            console.log(JSON.stringify({
-                senderId: currentUser?.id,
-                currentUser,
-            })); 
-
             emitEvent(SOCKET_EVENTS.MESSAGE_SEND, {
                 tempId,
                 chatId,
@@ -155,7 +146,6 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
                 messageType: "text",
             });
         } catch (error) {
-            // Remove optimistic message if emit fails
             setMessages((prev) =>
                 prev.filter((m) => m._id !== tempId)
             );
@@ -197,12 +187,6 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
                     <EmptyMessages />
                 ) : (
                     messages.map((msg) => {
-                        console.log({
-                            messageSender: msg.sender._id,
-                            currentUser: currentUser?._id,
-                            isMe: msg.sender._id === currentUser?._id,
-                        });
-
                         return (
                             <MessageBubble
                                 key={msg._id}
@@ -211,6 +195,9 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
                                 time={new Date(msg.createdAt).toLocaleTimeString([], {
                                     hour: "2-digit",
                                     minute: "2-digit",
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "2-digit",
                                 })}
                                 seen
                             />

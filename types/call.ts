@@ -36,7 +36,7 @@ export interface StartCallParams {
 }
 
 export interface IncomingCall {
-  chatId: string;
+  roomId: string;
   caller: User;
   receiver: User;
   type: CallType;

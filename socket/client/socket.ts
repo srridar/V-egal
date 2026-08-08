@@ -1,4 +1,6 @@
 import { io, Socket } from "socket.io-client";
+import { SOCKET_EVENTS } from "../socketEvents";
+import { SocketEvent } from "../socketEvents";
 
 let socket: Socket | null = null;
 let currentUserId: string | null = null;
@@ -23,13 +25,8 @@ export const initializeSocket = (userId: string): Socket => {
 
   socket = io(SOCKET_URL, {
     withCredentials: true,
-
-    query: {
-      userId,
-    },
-
+    query: { userId},
     autoConnect: true,
-
     reconnection: true,
     reconnectionAttempts: Infinity,
     reconnectionDelay: 1000,
@@ -54,9 +51,8 @@ export const initializeSocket = (userId: string): Socket => {
   socket.io.on("reconnect", (attempt) => {
     console.log(` Reconnected after ${attempt} attempt(s)`);
 
-
     if (currentRoomId) {
-      socket?.emit("join-room", currentRoomId);
+      socket?.emit(SOCKET_EVENTS.JOIN_ROOM, currentRoomId);
     }
   });
 
@@ -95,13 +91,12 @@ export const joinRoom = (roomId: string) => {
         return;
     }
     currentRoomId = roomId;
-    console.log("Joining room:", roomId);
-    socket.emit("join-room", roomId);
+    socket.emit(SOCKET_EVENTS.JOIN_ROOM, roomId);
 };
 
 export const leaveRoom = () => {
   if (!socket || !currentRoomId) return;
-  socket.emit("leave-room", currentRoomId);
+  socket.emit(SOCKET_EVENTS.LEAVE_ROOM, currentRoomId);
   currentRoomId = null;
 };
 
@@ -117,28 +112,43 @@ export const getCurrentRoom = () => {
   return currentRoomId;
 };
 
-export const emitEvent = <T>(event: string, payload?: T) => {
-    const socket = getSocket();
-    if (!socket) {
-        console.error("Socket is not initialized.");
-        return;
-    }
-    console.log("EMIT:", event, payload);
-    socket.emit(event, payload);
+export const emitEvent = <T = unknown>(  event: SocketEvent, payload?: T): void => {
+  const socket = getSocket();
+
+  if (!socket) {
+    console.warn(
+      "Socket is not initialized. Did you call initializeSocket()?"
+    );
+    return;
+  }
+  socket.emit(event, payload);
 };
 
-export const onEvent = (event: string, callback: (...args: any[]) => void) => {
+export const onEvent = (event: SocketEvent, callback: (...args: any[]) => void) => {
   const socket = getSocket();
+  if(!socket) {
+    console.warn("Socket not initialized");
+    return;
+  }
   socket.off(event, callback);
   socket.on(event, callback);
 };
 
-export const onceEvent = (event: string, callback: (...args: any[]) => void) => {
-  getSocket().once(event, callback);
+export const onceEvent = (event: SocketEvent, callback: (...args: any[]) => void) => {
+  const socket = getSocket();
+  if(!socket) {
+    console.warn("Socket not initialized");
+    return;
+  }
+  socket.once(event, callback);
 };
 
-export const offEvent = (event: string, callback?: (...args: any[]) => void) => {
+export const offEvent = (event: SocketEvent, callback?: (...args: any[]) => void) => {
   const socket = getSocket();
+  if(!socket) {
+    console.warn("Socket not initialized");
+    return;
+  }
 
   if (callback) {
     socket.off(event, callback);
@@ -152,11 +162,43 @@ export const disconnectSocket = () => {
 
   socket.removeAllListeners();
   socket.disconnect();
+
   socket = null;
   currentUserId = null;
   currentRoomId = null;
-  console.log(" Socket connection closed.");
+
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

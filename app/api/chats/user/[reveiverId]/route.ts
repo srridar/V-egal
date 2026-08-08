@@ -6,7 +6,6 @@ import { connectToDatabase } from "@/lib/db";
 export async function GET(req: NextRequest, { params }: { params: { receiverId: string } }) {
   try {
     await connectToDatabase();
-
     const userId = isAuthenticated(req);
 
     if (!userId) {

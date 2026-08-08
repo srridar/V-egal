@@ -61,9 +61,7 @@ export default function LoginPage() {
                 })
             );
  
-            toast.success("Login successful", {
-                id: loadingToast,
-            });
+            toast.success("Login successful", { id: loadingToast });
             router.push(`/profile`);
 
         } catch (err: any) {

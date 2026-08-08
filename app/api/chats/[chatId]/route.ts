@@ -22,6 +22,9 @@ export async function GET(req: NextRequest,  context: { params: Promise<{ chatId
     
     const chat = await getChatById(chatId, userId);
 
+
+    console.log("Fetched chat:", chat);
+
     return NextResponse.json(
       { data: chat },
       { status: 200 }

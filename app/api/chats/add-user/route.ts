@@ -13,7 +13,6 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-
     const body = await req.json();
     const { chatId, newUserId } = body;
 
@@ -23,7 +22,6 @@ export async function PUT(req: NextRequest) {
         { status: 400 }
       );
     }
-
 
     const chat = await Chat.findById(chatId);
 

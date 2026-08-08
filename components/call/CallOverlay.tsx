@@ -6,6 +6,7 @@ import AudioCall from "./AudioCall";
 import VideoCall from "./VideoCall";
 import IncomingCallModal from "./IncomingCallModal";
 import OutgoingCallModal from "./OutgoingCallModal";
+import ConnectingCall from "./ConnectingCall";
 
 export default function CallOverlay() {
   const {
@@ -32,25 +33,17 @@ export default function CallOverlay() {
   } = useCall();
 
   // Nothing to show
-  if (
-    callStatus === "idle" &&
-    !incomingCall &&
-    !outgoingUser
-  ) {
+  if (callStatus === "idle" && !incomingCall && !outgoingUser) {
     return null;
   }
 
+
   // Incoming Call
-  if (
-    incomingCall &&
-    callStatus === "ringing"
-  ) {
+  if (incomingCall && callStatus === "ringing") {
     return (
-      <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60">
         <IncomingCallModal
-          open={true}
-          caller={incomingCall.caller}
-          callType={incomingCall.type}
+          callerName={incomingCall.caller.name}
           onAccept={acceptCall}
           onReject={rejectCall}
         />
@@ -59,22 +52,34 @@ export default function CallOverlay() {
   }
 
   // Outgoing Call
-  if (  outgoingUser && (callStatus === "calling" || callStatus === "connecting")) {
+  if (outgoingUser && callStatus === "calling") {
     return (
-      <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <OutgoingCallModal
-          open={true}
-          receiver={outgoingUser}
-          callType={callType}
-          status={callStatus === "connecting" ? "ringing" : "calling"}
-          onCancel={endCall}
-        />
-      </div>
+      <OutgoingCallModal
+        open={true}
+        receiver={outgoingUser}
+        callType={callType}
+        status="calling"
+        onCancel={endCall}
+      />
+    );
+  }
+
+
+  if (callStatus === "connecting") {
+    console.log("Connecting call overlay rendered");
+    const user = outgoingUser ?? incomingCall?.caller;
+    if (!user) return null;
+
+    return (
+      <ConnectingCall
+        user={user}
+        onEndCall={endCall}
+      />
     );
   }
 
   // Active Audio Call
-  if ( callType === "audio" && callStatus === "connected") {
+  if (callType === "audio" && callStatus === "connected") {
     const user = outgoingUser ?? incomingCall?.caller;
 
     if (!user) return null;
@@ -93,7 +98,7 @@ export default function CallOverlay() {
   }
 
   // Active Video Call
-  if ( callType === "video" && callStatus === "connected") {
+  if (callType === "video" && callStatus === "connected") {
     const user = outgoingUser ?? incomingCall?.caller;
     if (!user) return null;
 

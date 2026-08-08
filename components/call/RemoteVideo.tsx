@@ -40,7 +40,7 @@ export default function RemoteVideo({
         className={`flex h-full w-full flex-col items-center justify-center bg-zinc-900 ${className}`}
       >
         <Image
-          src={user.avatar || "/default-avatar.png"}
+          src={user.avatar || "/public/person2.png"}
           alt={user.name}
           width={140}
           height={140}

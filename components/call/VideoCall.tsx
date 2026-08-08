@@ -68,7 +68,7 @@ export default function VideoCall({
       ) : (
         <div className="flex h-full flex-col items-center justify-center bg-zinc-900">
           <Image
-            src={user.avatar || "/default-avatar.png"}
+            src={user.avatar || "/public/person2.png"}
             alt={user.name}
             width={120}
             height={120}
@@ -100,7 +100,7 @@ export default function VideoCall({
           <div className="flex h-full flex-col items-center justify-center text-white">
 
             <Image
-              src={user.avatar || "/default-avatar.png"}
+              src={user.avatar || "/public/person2.png"}
               alt={user.name}
               width={60}
               height={60}

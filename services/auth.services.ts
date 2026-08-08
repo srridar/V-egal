@@ -119,7 +119,6 @@ export const getUserProfile = async (userId: string): Promise<UserResponse> => {
     if (!user) {
         throw new Error("User not found");
     }
-
     return {
         success: true,
         status: 200,
