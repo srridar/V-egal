@@ -12,6 +12,7 @@ import {
 import { useCall } from "@/context/CallProviderContext";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import type { User } from "@/types/call";
 
 interface ChatHeaderProps {
   chat: {
@@ -30,7 +31,7 @@ interface ChatHeaderProps {
       lastSeen?: string;
     };
 
-    participants?: any[];
+    participants?:  User[];
     lastMessage?: any;
   };
 }
@@ -81,12 +82,12 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
       chatId: chat._id,
       caller: {
         id: currentUser.id,
-        name: currentUser.name,
+        name: currentUser.username  || "Unknown User",
         avatar: currentUser.avatar,
       },
       receiver: {
         id: chat.receiver._id,
-        name: chat.receiver.name,
+        name: chat.receiver.username || "Unknown User",
         avatar: chat.receiver.avatar,
       },
     });
@@ -103,12 +104,12 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
       chatId: chat._id,
       caller: {
         id: currentUser.id,
-        name: currentUser.name,
+        name: currentUser.username  || "Unknown User",
         avatar: currentUser.avatar,
       },
       receiver: {
         id: chat.receiver._id,
-        name: chat.receiver.name,
+        name: chat.receiver.username || "Unknown User",
         avatar: chat.receiver.avatar,
       },
     });

@@ -15,7 +15,7 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
 
   const { socket } = useSocket();
   const [callStatus, setCallStatus] = useState<CallStatus>("idle");
-  const [callType, setCallType] = useState<CallType>("audio");
+  const [callType, setCallType] = useState<CallType | null >("audio");
   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
   const [outgoingUser, setOutgoingUser] = useState<User | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);

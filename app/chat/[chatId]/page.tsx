@@ -3,6 +3,7 @@ import { useParams } from "next/navigation";
 import ChatWindow from "@/components/chat/ChatWindow";
 import ChatHeader from "@/components/chat/ChatHeader";
 import { useEffect, useState } from "react";
+import type { User } from "@/types/call";
 
 interface Chat {
   _id: string;
@@ -11,7 +12,7 @@ interface Chat {
   receiverId?: string;
   isOnline?: boolean;
   lastSeen?: string;
-  participants?: number;
+  participants?: User[];
   type: "private" | "group";
 }
 
@@ -80,7 +81,6 @@ export default function ChatPage() {
   return (
     <div className="flex h-full flex-col">
       <ChatHeader chat={chat} />
-
       <div className="flex-1 overflow-hidden">
         <ChatWindow chatId={chat._id} />
       </div>

@@ -7,14 +7,14 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is not defined in environment variables");
 }
 
-// 🔹 Generate Token
+
 export const generateToken = (userId: string) => {
   return jwt.sign({ userId }, JWT_SECRET, {
     expiresIn: "7d",
   });
 };
 
-// 🔹 Verify Token
+
 export const verifyToken = (token: string) => {
   try {
     return jwt.verify(token, JWT_SECRET) as { userId: string };
@@ -23,9 +23,10 @@ export const verifyToken = (token: string) => {
   }
 };
 
-// 🔹 Set Cookie
-export const setAuthCookie = (token: string) => {
-  cookies().set("token", token, {
+
+export const setAuthCookie = async(token: string) => {
+  const cookieStore = await cookies();
+  cookieStore.set("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
@@ -34,18 +35,20 @@ export const setAuthCookie = (token: string) => {
   });
 };
 
-// 🔹 Remove Cookie (Logout)
-export const removeAuthCookie = () => {
-  cookies().set("token", "", {
+
+export const removeAuthCookie = async () => {
+  const cookieStore = await cookies();
+  cookieStore.set("token", "", {
     httpOnly: true,
     expires: new Date(0),
     path: "/",
   });
 };
 
-// 🔹 Get Current User ID from Cookie
-export const getUserFromToken = () => {
-  const token = cookies().get("token")?.value;
+
+export const getUserFromToken = async() => {
+   const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
 
   if (!token) return null;
 

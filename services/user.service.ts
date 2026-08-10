@@ -9,8 +9,6 @@ export interface UserResponse {
   users?: any[];
 }
 
-
-
 export const getAllUsers = async (): Promise<UserResponse> => {
   const users = await User.find({})
     .select("-password -__v")

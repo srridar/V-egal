@@ -1,19 +1,43 @@
-
 import Message from "@/models/Message";
 import Chat from "@/models/Chat";
 import { uploadFile } from "@/lib/upload";
 
+type MessageType =
+    | "text"
+    | "image"
+    | "file"
+    | "audio"
+    | "video";
 
-//  1.                    Send Message (TEXT / FILE)
+interface SendMessageData {
+    chatId: string;
+    senderId: string;
+    content?: string;
+    file?: File;
+    messageType: MessageType;
+}
 
-export const sendMessage = async (data: { chatId: string, senderId: string, content?: string, file?: string, fileName?: string, messageType: "text" | "image" | "file" | "audio" | "video"; }) => {
 
-    const { chatId, senderId, content, file, fileName, messageType } = data;
+//  1.             Send Message (TEXT / FILE)
+
+export const sendMessage = async (data: SendMessageData) => {
+    const {
+        chatId,
+        senderId,
+        content,
+        file,
+        messageType,
+    } = data;
+
     if (!chatId || !senderId) {
         throw new Error("chatId and senderId required");
     }
+
     const chat = await Chat.findById(chatId);
-    if (!chat) throw new Error("Chat not found");
+
+    if (!chat) {
+        throw new Error("Chat not found");
+    }
 
     const isParticipant = chat.participants.some(
         (id: any) => id.toString() === senderId
@@ -23,23 +47,33 @@ export const sendMessage = async (data: { chatId: string, senderId: string, cont
         throw new Error("You are not part of this chat");
     }
 
-    let fileData: any = {};
+    let fileData: {
+        fileUrl?: string;
+        fileName?: string;
+        fileSize?: number;
+    } = {};
 
-    //  upload file if exists 
+    // Upload file to Cloudinary
     if (file) {
-
-        if (!["image", "file", "audio", "video"].includes(messageType)) {
-            throw new Error("Invalid file type");
+        if (messageType === "text") {
+            throw new Error(
+                "Text messages cannot contain a file"
+            );
         }
 
-        const uploadRes = await uploadFile(file, messageType);
+        const uploadRes = await uploadFile(
+            file,
+            messageType
+        );
+
         fileData = {
             fileUrl: uploadRes.url,
-            fileName,
+            fileName: file.name,
             fileSize: uploadRes.bytes,
         };
     }
 
+    // Create message
     const message = await Message.create({
         chat: chatId,
         sender: senderId,
@@ -48,18 +82,20 @@ export const sendMessage = async (data: { chatId: string, senderId: string, cont
         ...fileData,
     });
 
+    // Update latest message
     await Chat.findByIdAndUpdate(chatId, {
         latestMessage: message._id,
     });
 
-    const populatedMessage = await Message.findById(message._id)
+    // Populate message
+    const populatedMessage = await Message.findById(
+        message._id
+    )
         .populate("sender", "-password")
         .populate("chat");
 
-
     return populatedMessage;
 };
-
 
 
 
@@ -117,7 +153,7 @@ export const deleteMessageForEveryone = async (messageId: string, userId: string
 
 
 //           5. Delete Message (for me)
-export const deleteMessageForMe = async (  messageId: string, userId: string) => {
+export const deleteMessageForMe = async (messageId: string, userId: string) => {
     const message = await Message.findById(messageId);
     if (!message) throw new Error("Message not found");
     await Message.findByIdAndUpdate(messageId, {

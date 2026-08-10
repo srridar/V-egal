@@ -10,7 +10,6 @@ import {
   Phone,
   Video,
   UserPlus,
-  UserMinus,
   ShieldBan,
   Flag,
   Mail,
@@ -57,7 +56,7 @@ export default function OtherUserProfilePage() {
         throw new Error(data.message);
       }
       setUser(data.user);
-    
+
     } catch (error) {
       console.log(error)
       toast.error("Failed to fetch to profile");
@@ -70,15 +69,11 @@ export default function OtherUserProfilePage() {
   }, [dispatch, userId]);
 
 
-
   return (
     <div className="min-h-screen bg-black text-zinc-100 antialiased selection:bg-zinc-800 selection:text-white">
       <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6">
-
-   
         <div className="flex items-center justify-between">
           <Button
-            variant="ghost"
             onClick={() => router.back()}
             className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/50 transition-all rounded-xl pl-2 pr-4 flex gap-1 items-center"
           >
@@ -100,8 +95,8 @@ export default function OtherUserProfilePage() {
                 <div className="relative group">
                   <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-violet-500 rounded-full blur-md opacity-30 group-hover:opacity-40 transition-opacity" />
                   <Image
-                    src={user?.avatar}
-                    alt={user?.username}
+                    src={user?.avatar || "/public/person2.png"}
+                    alt={user?.username || "person"}
                     width={140}
                     height={140}
                     className="rounded-full border-4 border-black relative z-10 shadow-xl object-cover aspect-square"
@@ -133,94 +128,92 @@ export default function OtherUserProfilePage() {
                     Add Friend
                   </Button>
 
-                  <Button variant="outline" className="border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-300 hover:text-zinc-100 flex gap-2 items-center rounded-xl px-4">
+                  <Button
+                    className="border-zinc-800 bg-zinc-900/30 text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200"
+                  >
                     <MessageCircle className="mr-2 h-4 w-4" />
                     Message
                   </Button>
 
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="icon" className="border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 rounded-xl w-10 h-10">
-                      <Phone className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 rounded-xl w-10 h-10">
-                      <Video className="h-4 w-4" />
-                    </Button>
+                <div className="flex gap-2">
+                  <Button
+                    className="border-zinc-800 bg-zinc-900/30 text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200 rounded-xl w-10 h-10"
+                  >
+                    <Phone className="h-4 w-4" />
+                  </Button>
+                  <Button  className="border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 rounded-xl w-10 h-10">
+                    <Video className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-7 space-y-6 lg:border-l lg:border-zinc-900 lg:pl-8 w-full">
+
+              <div className="space-y-4">
+                <h4 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Information</h4>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
+                    <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><Mail className="h-4 w-4" /></div>
+                    <div className="overflow-hidden">
+                      <p className="text-xs text-zinc-500 font-medium">Email Address</p>
+                      <p className="text-sm text-zinc-300 truncate font-medium">{user?.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
+                    <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><PhoneCall className="h-4 w-4" /></div>
+                    <div>
+                      <p className="text-xs text-zinc-500 font-medium">Phone Number</p>
+                      <p className="text-sm text-zinc-300 font-medium">{user?.phone}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
+                    <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><Calendar className="h-4 w-4" /></div>
+                    <div>
+                      <p className="text-xs text-zinc-500 font-medium">Member Since</p>
+                      <p className="text-sm text-zinc-300 font-medium">{user?.createdAt}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
+                    <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><Clock className="h-4 w-4" /></div>
+                    <div>
+                      <p className="text-xs text-zinc-500 font-medium">Activity Status</p>
+                      <p className="text-sm text-zinc-300 font-medium">
+                        {user?.isOnline ? <span className="text-emerald-400 font-semibold">Online now</span> : `Seen ${user?.lastSeen}`}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="lg:col-span-7 space-y-6 lg:border-l lg:border-zinc-900 lg:pl-8 w-full">
+              <Separator className="bg-zinc-900" />
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Safety & Privacy</h4>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button
+                    className="w-full justify-start text-zinc-400 hover:text-rose-400 hover:bg-rose-950/20 border border-transparent hover:border-rose-900/30 rounded-xl h-10 text-xs font-medium transition-all"
+                  >
+                    <ShieldBan className="mr-2 h-4 w-4" />
+                    Block {user?.username || user?.name}
+                  </Button>
 
-                <div className="space-y-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Information</h4>
-
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
-                      <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><Mail className="h-4 w-4" /></div>
-                      <div className="overflow-hidden">
-                        <p className="text-xs text-zinc-500 font-medium">Email Address</p>
-                        <p className="text-sm text-zinc-300 truncate font-medium">{user?.email}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
-                      <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><PhoneCall className="h-4 w-4" /></div>
-                      <div>
-                        <p className="text-xs text-zinc-500 font-medium">Phone Number</p>
-                        <p className="text-sm text-zinc-300 font-medium">{user?.phone}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
-                      <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><Calendar className="h-4 w-4" /></div>
-                      <div>
-                        <p className="text-xs text-zinc-500 font-medium">Member Since</p>
-                        <p className="text-sm text-zinc-300 font-medium">{user?.createdAt}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
-                      <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><Clock className="h-4 w-4" /></div>
-                      <div>
-                        <p className="text-xs text-zinc-500 font-medium">Activity Status</p>
-                        <p className="text-sm text-zinc-300 font-medium">
-                          {user?.isOnline ? <span className="text-emerald-400 font-semibold">Online now</span> : `Seen ${user?.lastSeen}`}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <Button
+                    className="w-full justify-start text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900 rounded-xl h-10 text-xs font-medium transition-all"
+                  >
+                    <Flag className="mr-2 h-4 w-4" />
+                    Report Profile
+                  </Button>
                 </div>
-
-                <Separator className="bg-zinc-900" />
-                <div className="space-y-3">
-                  <h4 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Safety & Privacy</h4>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-zinc-400 hover:text-rose-400 hover:bg-rose-950/20 border border-transparent hover:border-rose-900/30 rounded-xl h-10 text-xs font-medium transition-all"
-                    >
-                      <ShieldBan className="mr-2 h-4 w-4" />
-                      Block {user?.username || user?.name}
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900 rounded-xl h-10 text-xs font-medium transition-all"
-                    >
-                      <Flag className="mr-2 h-4 w-4" />
-                      Report Profile
-                    </Button>
-                  </div>
-                </div>
-
               </div>
-
             </div>
           </div>
-
         </div>
-
       </div>
     </div>
+    </div >
   );
 }

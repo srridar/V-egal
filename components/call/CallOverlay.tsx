@@ -52,7 +52,7 @@ export default function CallOverlay() {
   }
 
   // Outgoing Call
-  if (outgoingUser && callStatus === "calling") {
+  if  (outgoingUser && callStatus === "calling" && callType){
     return (
       <OutgoingCallModal
         open={true}

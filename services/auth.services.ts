@@ -26,7 +26,6 @@ interface AuthResponse {
         id: string;
         username: string;
         email: string;
-        avatar: string;
     };
     token?: string;
 }
@@ -49,11 +48,11 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const registerUser = async (data: { name: string; email: string; password: string }): Promise<AuthResponse> => {
+export const registerUser = async (data: { username: string; email: string; password: string }): Promise<AuthResponse> => {
 
-    const { name, email, password } = data;
+    const { username, email, password } = data;
 
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
         throw new Error("All fields are required");
     }
 
@@ -62,7 +61,7 @@ export const registerUser = async (data: { name: string; email: string; password
         throw new Error("User already exists");
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword });
+    const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
 
     const token = generateToken(newUser._id.toString());
@@ -70,7 +69,7 @@ export const registerUser = async (data: { name: string; email: string; password
     return {
         message: "User registered successfully",
         status: 201,
-        user: { id: newUser._id, name: newUser.name, email: newUser.email },
+        user: { id: newUser._id, username: newUser.username, email: newUser.email },
         token,
     };
 }
@@ -102,7 +101,6 @@ export const loginUser = async (data: { email: string; password: string }): Prom
             id: user._id.toString(),
             username: user.username,
             email: user.email,
-            avatar: user.avatar,
         },
         token,
     };
@@ -228,7 +226,6 @@ export const changePassword = async (userId: string, data: ChangePasswordInput) 
 
 export const sendResetPasswordEmail = async (email: string, resetToken: string, name: string) => {
 
-
     const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${resetToken}`;
 
     await transporter.sendMail({
@@ -305,11 +302,7 @@ export const forgotPassword = async (email: string) => {
 
 }
 
-export const resetPassword = async (data: {
-    token: string;
-    password: string;
-    confirmPassword: string;
-}) => {
+export const resetPassword = async (data: { token: string; password: string; confirmPassword: string;}) => {
 
     const { token, password, confirmPassword } = data;
 

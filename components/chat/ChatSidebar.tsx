@@ -10,20 +10,8 @@ import type { RootState } from "@/redux/store";
 import Button from "../ui/Button";
 import { toast } from "sonner";
 import { AddFriend } from "@/helper/friend"
+import type { User } from "@/types/call";
 
-
-interface User {
-  id: string;
-  name: string;
-  avatar?: string;
-  isOnline?: boolean;
-}
-
-interface ChatContact {
-  _id?: string;
-  users?: { id: string }[];
-  lastMessage?: any;
-}
 
 export default function ChatSidebar() {
   const [search, setSearch] = useState("");
@@ -34,7 +22,6 @@ export default function ChatSidebar() {
 
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const router = useRouter();
-
  
 
   const handleUserClick = async (receiverId: string) => {
@@ -163,11 +150,11 @@ export default function ChatSidebar() {
   );
 
   const visibleUsers = filteredUsers.filter(
-    (user) => user._id !== currentUser?.id
+    (user) => user.id !== currentUser?.id
   );
 
   const isFriend = (userId: string) => {
-    return friends.some(friend => friend._id === userId);
+    return friends.some(friend => friend.id === userId);
   };
 
   return (
@@ -248,8 +235,8 @@ export default function ChatSidebar() {
         {visibleUsers.length > 0 ? (
           visibleUsers.map((user) => (
             <div
-              key={user._id}
-              onClick={() => handleUserClick(user._id)}
+              key={user.id}
+              onClick={() => handleUserClick(user.id)}
               className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-zinc-800 transition"
             >
               {/* Avatar */}
@@ -261,10 +248,6 @@ export default function ChatSidebar() {
                   height={56}
                   className="h-14 w-14 rounded-full object-cover ring-1 ring-zinc-800"
                 />
-
-                {user.isOnline && (
-                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-black rounded-full" />
-                )}
               </div>
 
               {/* Info */}
@@ -272,25 +255,15 @@ export default function ChatSidebar() {
                 <h2 className="text-sm font-semibold text-white">
                   {user.name}
                 </h2>
-
-                <p className="text-xs text-gray-400">
-                  {user.isOnline ? "Online" : "Offline"}
-                </p>
               </div>
 
               <div className="flex gap-1">
-                {isFriend(user._id) ? (
-                  <Button
-                    className="font-mono bg-violet-700"
-                    onClick={() => messageHandler(user?._id)}
-                  >
+                {isFriend(user.id) ? (
+                  <Button  className="font-mono bg-violet-700"  onClick={() => messageHandler(user?.id)}>
                     Chat
                   </Button>
                 ) : (
-                  <Button
-                    className="font-mono bg-blue-500"
-                    onClick={() => handleAddFrined(user?._id)}
-                  >
+                  <Button  className="font-mono bg-blue-500"  onClick={() => handleAddFrined(user?.id)}>
                     Add Friend
                   </Button>
                 )}

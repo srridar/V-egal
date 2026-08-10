@@ -1,21 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-export interface IUser {
-    _id: string;
-    username: string;
-    email: string;
-    avatar?: string;
-    bio?: string;
-    isVerified?: boolean;
-    isOnline?: boolean;
-    lastSeen?: Date | string;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-
-    socketId?: string;
-
-}
-
+import { IUser } from "@/types/user";
 
 interface AuthState {
     user: IUser | null;
@@ -97,7 +81,7 @@ const authSlice = createSlice({
         },
         addContact(state, action: PayloadAction<IUser>) {   //  add a new contact to the logged-in user's contact list. This is typically called when the user adds a new contact in the app.
             const contactExists = state.contacts.some(
-                (contact) => contact._id === action.payload._id
+                (contact) => contact.id === action.payload.id
             );
             if (!contactExists) {
                 state.contacts.push(action.payload);
@@ -105,7 +89,7 @@ const authSlice = createSlice({
         },
         removeContact(state, action: PayloadAction<string>) { // remove a contact from the logged-in user's contact list. This is typically called when the user removes a contact in the app.
             state.contacts = state.contacts.filter(
-                (user) => user._id !== action.payload
+                (user) => user.id !== action.payload
             );
         },
 

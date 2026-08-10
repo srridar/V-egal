@@ -200,6 +200,5 @@ export const removeUserFromGroup = async (chatId: string, userId: string) => {
     if (!updatedChat) {
         throw new Error("Chat not found");
     }
-
     return updatedChat;
 }

@@ -3,9 +3,13 @@ import { isAuthenticated } from "@/lib/authGuard";
 import { accessChat } from "@/services/chat.services";
 import { connectToDatabase } from "@/lib/db";
 
-export async function GET(req: NextRequest, { params }: { params: { receiverId: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ receiverId: string }> }
+) {
   try {
     await connectToDatabase();
+
     const userId = isAuthenticated(req);
 
     if (!userId) {
@@ -15,7 +19,7 @@ export async function GET(req: NextRequest, { params }: { params: { receiverId: 
       );
     }
 
-     const { receiverId } = params;
+    const { receiverId } = await params;
 
     if (!receiverId || receiverId.trim() === "") {
       return NextResponse.json(
@@ -37,7 +41,6 @@ export async function GET(req: NextRequest, { params }: { params: { receiverId: 
       { data: chat },
       { status: 200 }
     );
-
   } catch (error: any) {
     console.error("GET /api/chat error:", error);
 

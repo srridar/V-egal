@@ -46,7 +46,7 @@ export interface IncomingCall {
 
 export interface CallContextType {
   callStatus: CallStatus;
-  callType: CallType;
+  callType: CallType | null;
   incomingCall: IncomingCall | null;
   outgoingUser: User | null;
 

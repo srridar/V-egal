@@ -104,23 +104,13 @@ export default function ChangePasswordPage() {
                     </div>
                 </div>
 
-                <h1 className="text-3xl font-bold mb-2">
-                    Change Password
-                </h1>
-                <p className="text-slate-400 mb-8">
-                    Keep your account secure by updating your password.
-                </p>
+                <h1 className="text-3xl font-bold mb-2"> Change Password </h1>
+                <p className="text-slate-400 mb-8">  Keep your account secure by updating your password.</p>
 
-                {/* Form */}
-                <form
-                    onSubmit={handleSubmit}
-                    className="max-w-xl space-y-6 bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md"
-                >
 
-                    {/* Current */}
-                    <PasswordField
-                        label="Current Password"
-                        value={form.currentPassword}
+                <form  onSubmit={handleSubmit}  className="max-w-xl space-y-6 bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+
+                    <PasswordField label="Current Password" value={form.currentPassword}
                         onChange={(e: any) =>
                             setForm({ ...form, currentPassword: e.target.value })
                         }
@@ -147,9 +137,7 @@ export default function ChangePasswordPage() {
                     <PasswordField
                         label="Confirm Password"
                         value={form.confirmPassword}
-                        onChange={(e: any) =>
-                            setForm({ ...form, confirmPassword: e.target.value })
-                        }
+                        onChange={(e: any) =>  setForm({ ...form, confirmPassword: e.target.value }) }
                         visible={show.confirm}
                         toggle={() =>
                             setShow({ ...show, confirm: !show.confirm })
@@ -167,7 +155,6 @@ export default function ChangePasswordPage() {
                     </button>
                 </form>
 
-                {/* Warning */}
                 <p className="text-xs text-slate-500 mt-4 text-center">
                     Never share your password with anyone.
                 </p>

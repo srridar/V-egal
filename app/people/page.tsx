@@ -8,13 +8,15 @@ import FriendRequestCard from "@/components/people/FriendRequestCard";
 import EmptyState from "@/components/people/EmptyState";
 import FriendCard from "@/components/people/FriendCard";
 import FriendRequestSendCard from "@/components/people/FriendRequestSendCard";
+import { IUser } from "@/types/user";
 
+type UserStatus = "friend" | "received" | "pending" | "none";
 
 export default function PeoplePage() {
   const [tab, setTab] = useState("users");
   const [search, setSearch] = useState("");
-  const [users, setUsers] = useState(null);
-  const [friends, setFriends] = useState([]);
+  const [users, setUsers] = useState<IUser[] | null>(null);
+  const [friends, setFriends] = useState<IUser[]>([]);
   const [requests, setRequests] = useState([]);
   const [requestsSent, setRequestsSent] = useState([])
 
@@ -97,8 +99,7 @@ export default function PeoplePage() {
     if (!users) return [];
 
     return users.filter(
-      (user) =>
-        user.name?.toLowerCase().includes(search.toLowerCase()) ||
+      (user) => 
         user.username?.toLowerCase().includes(search.toLowerCase())
     );
   }, [users, search]);

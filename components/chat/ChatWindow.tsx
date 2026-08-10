@@ -62,13 +62,6 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
     }, [chatId]);
 
 
-    useEffect(() => {
-        console.log("ChatWindow Mounted");
-
-        return () => {
-            console.log("ChatWindow Unmounted");
-        };
-    }, []);
 
 
     useEffect(() => {
@@ -95,9 +88,9 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
             });
         };
 
-        onEvent(SOCKET_EVENTS.MESSAGE_RECEIVE, receiveMessage);
+        onEvent(SOCKET_EVENTS.RECEIVE_MESSAGE, receiveMessage);
         return () => {
-            offEvent(SOCKET_EVENTS.MESSAGE_RECEIVE, receiveMessage);
+            offEvent(SOCKET_EVENTS.RECEIVE_MESSAGE, receiveMessage);
         };
     }, []);
 
@@ -138,7 +131,7 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
         setMessages((prev) => [...prev, optimisticMessage]);
 
         try {
-            emitEvent(SOCKET_EVENTS.MESSAGE_SEND, {
+            emitEvent(SOCKET_EVENTS.SEND_MESSAGE, {
                 tempId,
                 chatId,
                 senderId: currentUser?.id,

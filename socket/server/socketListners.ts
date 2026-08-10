@@ -24,33 +24,43 @@ export const registerSocketListeners = (io: Server, socket: Socket) => {
 
 
   socket.on(SOCKET_EVENTS.SEND_MESSAGE, async (data) => {
-    try {
-      const { tempId, chatId, senderId, content, messageType, file, fileName } = data;
+      try {
+        const {
+          tempId,
+          chatId,
+          senderId,
+          content,
+          messageType,
+        } = data;
 
-      // Save to MongoDB
-      const message = await sendMessage({
-        chatId,
-        senderId,
-        content,
-        file,
-        fileName,
-        messageType,
-      });
+        // Save message to MongoDB
+        const message = await sendMessage({
+          chatId,
+          senderId,
+          content,
+          messageType,
+        });
 
-      // Send the saved message to everyone in the room
-      io.to(chatId).emit(SOCKET_EVENTS.RECEIVE_MESSAGE, {
-        ...message.toObject(),
-        tempId,
-      });
+        // Send saved message to everyone in the room
+        io.to(chatId).emit(SOCKET_EVENTS.RECEIVE_MESSAGE,
+          {
+            ...message.toObject(),
+            tempId,
+          }
+        );
+      } catch (error: any) {
+        console.error( "Error sending message:", error);
 
-    } catch (error: any) {
-      console.error(" Error sending message:", error);
-
-      socket.emit(SOCKET_EVENTS.MESSAGE_ERROR, {
-        message: error.message || "Failed to send message",
-      });
+        socket.emit( SOCKET_EVENTS.MESSAGE_ERROR,
+          {
+            message: error.message || "Failed to send message",
+          }
+        );
+      }
     }
-  });
+  );
+
+
 
   socket.on(SOCKET_EVENTS.CALL_USER, (data) => {
     io.to(`user:${data.receiver.id}`).emit(
