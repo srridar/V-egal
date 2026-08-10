@@ -1,39 +1,50 @@
+
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+const getMongoDBUri = (): string => {
+    const uri = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI environment variable is not defined");
-}
+    if (!uri) {
+        throw new Error(
+            "MONGODB_URI environment variable is not defined"
+        );
+    }
 
+    return uri;
+};
 
 let cached = (global as any).mongoose;
 
 if (!cached) {
-  cached = (global as any).mongoose = {
-    conn: null,
-    promise: null,
-  };
+    cached = (global as any).mongoose = {
+        conn: null,
+        promise: null,
+    };
 }
 
 export async function connectToDatabase() {
-  // Return cached connection if exists
-  if (cached.conn) return cached.conn;
+    // Return existing connection
+    if (cached.conn) {
+        return cached.conn;
+    }
 
-  //  Create new connection if not exists
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "chatapp",
-      bufferCommands: false,
-    });
-  }
+    // Create connection
+    if (!cached.promise) {
+        const MONGODB_URI = getMongoDBUri();
 
-  try {
-    cached.conn = await cached.promise;
-  } catch (err) {
-    cached.promise = null;
-    throw err;
-  }
+        cached.promise = mongoose.connect(MONGODB_URI, {
+            dbName: "v-egal",
+            bufferCommands: false,
+        });
+    }
 
-  return cached.conn;
+    try {
+        cached.conn = await cached.promise;
+    } catch (error) {
+        cached.promise = null;
+        throw error;
+    }
+
+    return cached.conn;
 }
+
