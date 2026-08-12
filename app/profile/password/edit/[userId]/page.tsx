@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-    Eye,
-    EyeOff,
-    ShieldCheck,
-} from "lucide-react";
+import {  Eye,  EyeOff,  ShieldCheck} from "lucide-react";
+import { toast } from 'sonner'
 
 
 export default function ChangePasswordPage() {
@@ -45,7 +42,7 @@ export default function ChangePasswordPage() {
 
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
-            alert("Password updated successfully ");
+            toast.success("Password updated successfully ");
 
             setForm({
                 currentPassword: "",
@@ -60,7 +57,7 @@ export default function ChangePasswordPage() {
         }
     };
 
-    // 🔥 Input field component
+
     const PasswordField = ({
         label,
         value,
@@ -145,7 +142,6 @@ export default function ChangePasswordPage() {
                         placeholder="Re-enter new password"
                     />
 
-                    {/* Submit */}
                     <button
                         type="submit"
                         disabled={loading}

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch } from "@/redux/hook";
-
 import {
   ArrowLeft,
   MessageCircle,
@@ -13,7 +12,6 @@ import {
   ShieldBan,
   Flag,
   Mail,
-  PhoneCall,
   Calendar,
   Clock,
   BadgeCheck,
@@ -27,10 +25,8 @@ import { toast } from 'sonner'
 
 type User = {
   _id: string;
-  name: string;
   username: string;
   email: string;
-  phone?: string;
   avatar?: string;
   bio?: string;
   isOnline: boolean;
@@ -109,7 +105,7 @@ export default function OtherUserProfilePage() {
                 <div className="space-y-1.5 w-full">
                   <div className="flex items-center justify-center lg:justify-start gap-2">
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">
-                      {user?.username || user?.name}
+                      {user?.username}
                     </h1>
                     {user?.isVerified && (
                       <BadgeCheck className="text-blue-500 h-5 w-5 fill-blue-500/10" />
@@ -162,14 +158,7 @@ export default function OtherUserProfilePage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
-                    <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><PhoneCall className="h-4 w-4" /></div>
-                    <div>
-                      <p className="text-xs text-zinc-500 font-medium">Phone Number</p>
-                      <p className="text-sm text-zinc-300 font-medium">{user?.phone}</p>
-                    </div>
-                  </div>
-
+                
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/20 border border-zinc-900/60">
                     <div className="p-2 bg-zinc-900 rounded-lg text-zinc-400"><Calendar className="h-4 w-4" /></div>
                     <div>
@@ -198,7 +187,7 @@ export default function OtherUserProfilePage() {
                     className="w-full justify-start text-zinc-400 hover:text-rose-400 hover:bg-rose-950/20 border border-transparent hover:border-rose-900/30 rounded-xl h-10 text-xs font-medium transition-all"
                   >
                     <ShieldBan className="mr-2 h-4 w-4" />
-                    Block {user?.username || user?.name}
+                    Block {user?.username}
                   </Button>
 
                   <Button

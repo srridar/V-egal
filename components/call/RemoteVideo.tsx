@@ -2,17 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { User } from "@/types/call";
 
 interface RemoteVideoProps {
   stream: MediaStream | null;
-
-  user: {
-    name: string;
-    avatar?: string;
-  };
-
+  user: User;
   isVideoEnabled?: boolean;
-
   className?: string;
 }
 
@@ -41,19 +36,14 @@ export default function RemoteVideo({
       >
         <Image
           src={user.avatar || "/public/person2.png"}
-          alt={user.name}
+          alt={user.username}
           width={140}
           height={140}
           className="rounded-full border-4 border-zinc-700 object-cover"
         />
 
-        <h2 className="mt-5 text-2xl font-semibold text-white">
-          {user.name}
-        </h2>
-
-        <p className="mt-2 text-sm text-zinc-400">
-          Camera Off
-        </p>
+        <h2 className="mt-5 text-2xl font-semibold text-white"> {user.username} </h2>
+        <p className="mt-2 text-sm text-zinc-400"> Camera Off </p>
       </div>
     );
   }

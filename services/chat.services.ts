@@ -2,7 +2,6 @@ import Chat from "@/models/Chat";
 import "@/models/Message";
 
 //       create or get a chat between two users 1-1 
-
 export const accessChat = async (userId: string, targetUserId: string) => {
     if (!targetUserId) {
         throw new Error("Target userId is required");
@@ -25,7 +24,7 @@ export const accessChat = async (userId: string, targetUserId: string) => {
             path: "lastMessage",
             populate: {
                 path: "sender",
-                select: "name username avatar",
+                select: "username username avatar",
             },
         });
 
@@ -46,7 +45,7 @@ export const accessChat = async (userId: string, targetUserId: string) => {
             path: "lastMessage",
             populate: {
                 path: "sender",
-                select: "name username avatar",
+                select: "username username avatar",
             },
         });
 
@@ -54,24 +53,20 @@ export const accessChat = async (userId: string, targetUserId: string) => {
 };
 
 
-
 export const getChatById = async (chatId: string, userId: string) => {
     if (!chatId || !userId) {
         throw new Error("chatId and userId are required");
     }
 
-    const chat = await Chat.findOne({
-        _id: chatId,
-        participants: userId,
-    }).populate(
+    const chat = await Chat.findOne({_id: chatId, participants: userId}).populate(
             "participants",
-            "name username avatar isOnline lastSeen"
+            "username avatar isOnline lastSeen"
         )
         .populate({
             path: "lastMessage",
             populate: {
                 path: "sender",
-                select: "name username avatar",
+                select: "username avatar",
             },
         });
 
@@ -101,7 +96,6 @@ export const getChatById = async (chatId: string, userId: string) => {
 
         response.receiver = {
             _id: String(receiver._id),
-            name: receiver.name ?? "",
             username: receiver.username ?? "",
             avatar: receiver.avatar ?? "",
             isOnline: receiver.isOnline ?? false,
@@ -109,7 +103,7 @@ export const getChatById = async (chatId: string, userId: string) => {
         };
 
     } else {
-        response.name = chat.name;
+        response.username = chat.username;
         response.avatar = chat.avatar;
         response.admins = chat.admins;
         response.participants = chat.participants;
@@ -120,7 +114,6 @@ export const getChatById = async (chatId: string, userId: string) => {
 
 
 //        2. Create Group Chat
-
 export const createGroupChat = async (data: { name: string; users: string[]; adminId: string }) => {
     const { name, users, adminId } = data;
 
@@ -140,7 +133,6 @@ export const createGroupChat = async (data: { name: string; users: string[]; adm
 }
 
 
-
 //       3. Get all chats of a user
 export const getUserChats = async (userId: string) => {
     const chats = await Chat.find({ users: { $elemMatch: { $eq: userId } } })
@@ -153,9 +145,7 @@ export const getUserChats = async (userId: string) => {
 }
 
 
-
 //       4. Rename Group Chat
-
 export const renameGroup = async (chatId: string, newName: string) => {
     const updatedChat = await Chat.findByIdAndUpdate(
         chatId,
@@ -172,7 +162,6 @@ export const renameGroup = async (chatId: string, newName: string) => {
 
 
 //       5. Add user to group chat
-
 export const addToGroup = async (chatId: string, userId: string) => {
     const updatedChat = await Chat.findByIdAndUpdate(
         chatId,
@@ -189,7 +178,6 @@ export const addToGroup = async (chatId: string, userId: string) => {
 
 
 //       6. Remove user from group chat
-
 export const removeUserFromGroup = async (chatId: string, userId: string) => {
     const updatedChat = await Chat.findByIdAndUpdate(
         chatId,

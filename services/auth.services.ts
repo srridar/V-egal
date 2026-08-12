@@ -110,9 +110,7 @@ export const getUserProfile = async (userId: string): Promise<UserResponse> => {
     if (!userId) {
         throw new Error("User ID is required");
     }
-    const user = await User.findById(userId)
-        .select("-password -__v")
-        .lean();
+    const user = await User.findById(userId).select("-password -__v").lean();
 
     if (!user) {
         throw new Error("User not found");
@@ -164,10 +162,9 @@ export const updateProfile = async (userId: string, data: UpdateProfileInput) =>
         throw new Error("User not found");
     }
 
-
     return {
         id: user._id.toString(),
-        name: user.name,
+        username: user.username,
         email: user.email,
         avatar: user.avatar,
         avatarPublicId: user.avatarPublicId,
@@ -224,7 +221,7 @@ export const changePassword = async (userId: string, data: ChangePasswordInput) 
     };
 };
 
-export const sendResetPasswordEmail = async (email: string, resetToken: string, name: string) => {
+export const sendResetPasswordEmail = async (email: string, resetToken: string, username: string) => {
 
     const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${resetToken}`;
 
@@ -234,7 +231,7 @@ export const sendResetPasswordEmail = async (email: string, resetToken: string, 
         to: email,
         subject: "Reset Your Password",
         html: `
-            <h2>Hello ${name},</h2>
+            <h2>Hello ${username},</h2>
             <p>
                 You requested to reset your password.
             </p>
@@ -292,7 +289,7 @@ export const forgotPassword = async (email: string) => {
     await sendResetPasswordEmail(
         user.email,
         resetToken,
-        user.name
+        user.username
     );
 
     return {

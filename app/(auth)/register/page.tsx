@@ -12,16 +12,13 @@ export default function RegisterPage() {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const [form, setForm] = useState({
-        name: "",
+        username: "",
         email: "",
         password: "",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value,
-        });
+        setForm({ ...form, [e.target.name]: e.target.value,});
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -42,7 +39,6 @@ export default function RegisterPage() {
 
             dispatch(setUser(data.user));
             router.push("/chat");
-
             toast.success("Account created successfully");
 
         } catch (error: any) {
@@ -54,10 +50,8 @@ export default function RegisterPage() {
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center relative overflow-hidden ">
 
-
             <div className="absolute inset-0 bg-linear-to-br from-yellow-500/20 via-green-500/20 to-blue-500/20 blur-3xl opacity-50"></div>
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-
 
             <div className="relative z-10 w-full max-w-md p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
 
@@ -65,9 +59,7 @@ export default function RegisterPage() {
                     Create Account
                 </h1>
 
-                <p className="text-gray-400 text-center mb-6">
-                    Join and start chatting instantly
-                </p>
+                <p className="text-gray-400 text-center mb-6">Join and start chatting instantly</p>
 
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -75,8 +67,8 @@ export default function RegisterPage() {
                         <label className="text-sm  text-gray-300">Full Name</label>
                         <input
                             type="text"
-                            name="name"
-                            value={form.name}
+                            name="username"
+                            value={form.username}
                             placeholder="____Sushil Kumar____"
                             onChange={handleChange}
                             className="w-full mt-1 px-4 py-2 rounded-lg bg-black/40 border border-white/10 focus:outline-none focus:ring-2 focus:ring-green-400"

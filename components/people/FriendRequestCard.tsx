@@ -9,13 +9,12 @@ import { toast } from "sonner";
 
 interface FriendRequestCardProps {
   id: string;
-  name: string;
   username: string;
   avatar?: string;
   onSuccess: () => void;
 }
 
-const FriendRequestCard = ({ id, name, username, avatar, onSuccess }: FriendRequestCardProps) => {
+const FriendRequestCard = ({ id, username, avatar, onSuccess }: FriendRequestCardProps) => {
 
   const handleAcceptFriendReq = async (requestId: string) => {
     try {
@@ -43,15 +42,14 @@ const FriendRequestCard = ({ id, name, username, avatar, onSuccess }: FriendRequ
       <div className="flex items-center gap-4">
         <Image
           src={avatar || "/person2.png"}
-          alt={name ? name.charAt(0) : "User"}
+          alt={username ? username.charAt(0) : "User"}
           width={36}
           height={36}
           className="h-10 w-10 rounded-full object-cover ring-1 ring-zinc-800"
         />
 
         <div>
-          <h3 className="font-semibold">{name}</h3>
-          <p className="text-sm text-muted-foreground">@{username}</p>
+          <h3 className="font-semibold">{username}</h3>
         </div>
       </div>
 

@@ -69,7 +69,6 @@ const authSlice = createSlice({
             };
         },
 
-
         setSearchUsers(state, action: PayloadAction<IUser[]>) {  // set the list of users returned from a search query. This is typically called when the user performs a search for other users in the app.
             state.searchUsers = action.payload;
         },
@@ -92,9 +91,6 @@ const authSlice = createSlice({
                 (user) => user.id !== action.payload
             );
         },
-
-
-
 
         setOnlineUsers(state, action: PayloadAction<string[]>) {     //  set the list of online users. This is typically called when the app first connects to the socket server and receives the current list of online users.
             state.onlineUsers = action.payload;

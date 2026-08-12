@@ -2,12 +2,7 @@ import { createContext, useState, useRef, useEffect, useContext } from "react";
 import { CallContextType, User, IncomingCall, CallType, CallStatus } from "@/types/call";
 import { SOCKET_EVENTS } from "@/socket/socketEvents";
 import { useSocket } from "@/app/SocketProvider";
-
-export interface StartCallParams {
-  chatId: string;
-  caller: User;
-  receiver: User;
-}
+import { StartCallParams } from "@/types/call";
 
 const CallContext = createContext<CallContextType | null>(null);
 
@@ -134,8 +129,6 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
         offer,
       });
 
-  
-
     } catch (err) {
       console.error(err);
     }
@@ -150,16 +143,7 @@ export function CallProvider({ children }: { children: React.ReactNode; }) {
       const peer = await createPeer("video");
       const offer = await peer.createOffer();
       await peer.setLocalDescription(offer);
-
-      socket?.emit(SOCKET_EVENTS.CALL_INCOMING, {
-        roomId: chatId,
-        caller,
-        receiver,
-        type: "video",
-        offer,
-      });
-
-       console.log("Outgoing Video call offer sent to server:", offer);
+      socket?.emit(SOCKET_EVENTS.CALL_INCOMING, { roomId: chatId, caller, receiver, type: "video", offer});
 
     } catch (err) {
       console.error(err);

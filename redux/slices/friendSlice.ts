@@ -51,7 +51,6 @@ const friendSlice = createSlice({
     },
 
     // Friends
-
     setFriends(state, action: PayloadAction<IFriend[]>) {   // Replace the entire friends list from the backend
       state.friends = action.payload;
     },
@@ -67,7 +66,6 @@ const friendSlice = createSlice({
     },
 
     // Incoming Requests
-
     setIncomingRequests(state, action: PayloadAction<IFriendRequest[]>) {   //  Load pending incoming requests
       state.incomingRequests = action.payload;
     },

@@ -1,21 +1,14 @@
 "use client";
-
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import CallControls from "./CallControl";
+import { User } from '@/types/call'
 
 interface VideoCallProps {
   localStream: MediaStream | null;
   remoteStream: MediaStream | null;
-
-  user: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-
+  user: User;
   status: "calling" | "ringing" | "connected";
-
   isMuted: boolean;
   isCameraOff: boolean;
   speakerOn: boolean;
@@ -69,19 +62,14 @@ export default function VideoCall({
         <div className="flex h-full flex-col items-center justify-center bg-zinc-900">
           <Image
             src={user.avatar || "/public/person2.png"}
-            alt={user.name}
+            alt={user.username}
             width={120}
             height={120}
             className="rounded-full object-cover"
           />
 
-          <h2 className="mt-5 text-2xl font-semibold text-white">
-            {user.name}
-          </h2>
-
-          <p className="mt-2 capitalize text-zinc-400">
-            {status}
-          </p>
+          <h2 className="mt-5 text-2xl font-semibold text-white">  {user.username} </h2>
+          <p className="mt-2 capitalize text-zinc-400"> {status} </p>
         </div>
       )}
 
@@ -101,33 +89,26 @@ export default function VideoCall({
 
             <Image
               src={user.avatar || "/public/person2.png"}
-              alt={user.name}
+              alt={user.username}
               width={60}
               height={60}
               className="rounded-full"
             />
 
-            <p className="mt-3 text-xs">
-              Camera Off
-            </p>
+            <p className="mt-3 text-xs"> Camera Off  </p>
 
           </div>
         )}
 
       </div>
 
-      {/* Call Status */}
-      <div className="absolute left-6 top-6 text-white">
-        <h2 className="text-xl font-semibold">
-          {user.name}
-        </h2>
 
-        <p className="text-sm capitalize text-zinc-300">
-          {status}
-        </p>
+      <div className="absolute left-6 top-6 text-white">
+        <h2 className="text-xl font-semibold">  {user.username} </h2>
+        <p className="text-sm capitalize text-zinc-300">  {status} </p>
       </div>
 
-      {/* Bottom Controls */}
+
       <CallControls
         isVideoCall
         isMuted={isMuted}
@@ -138,7 +119,6 @@ export default function VideoCall({
         onToggleSpeaker={onToggleSpeaker}
         onEndCall={onEndCall}
       />
-
     </div>
   );
 }

@@ -38,7 +38,6 @@ export const rejectFriendRequest = async (requestId: string) => {
         if (!res.ok) {
             throw new Error(data.message || "Failed to reject friend request");
         }
-
         return data;
     } catch (error) {
         console.error(error);
@@ -49,8 +48,6 @@ export const rejectFriendRequest = async (requestId: string) => {
 
 export const AddFriend = async (receiverId: string) => {
     try {
-
-        console.log("receiver Id  at helper :"+ receiverId);
         const res = await fetch("/api/friendReq/send", {
             method: "POST",
             headers: {
@@ -100,7 +97,6 @@ export const cancleFriendRequest = async (requestId: string) => {
 
 export const removeFriend = async (friendId: string) => {
     try {
-
         const res = await fetch("/api/friendReq/remove", {
             method: "DELETE",
             headers: {

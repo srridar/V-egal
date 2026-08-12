@@ -2,12 +2,7 @@ import Message from "@/models/Message";
 import Chat from "@/models/Chat";
 import { uploadFile } from "@/lib/upload";
 
-type MessageType =
-    | "text"
-    | "image"
-    | "file"
-    | "audio"
-    | "video";
+type MessageType =  | "text"  | "image"  | "file"  | "audio"  | "video";
 
 interface SendMessageData {
     chatId: string;
@@ -16,7 +11,6 @@ interface SendMessageData {
     file?: File;
     messageType: MessageType;
 }
-
 
 //  1.             Send Message (TEXT / FILE)
 
@@ -98,7 +92,6 @@ export const sendMessage = async (data: SendMessageData) => {
 };
 
 
-
 //    2. Get all messages for a chat
 
 export const getMessages = async (chatId: string, userId: string) => {
@@ -108,9 +101,7 @@ export const getMessages = async (chatId: string, userId: string) => {
 };
 
 
-
 //    3. Mark Messages as Seen
-
 
 export const markMessagesAsSeen = async (chatId: string, userId: string) => {
     await Message.updateMany(
@@ -125,7 +116,6 @@ export const markMessagesAsSeen = async (chatId: string, userId: string) => {
     );
     return { success: true };
 };
-
 
 
 //            4. Delete Message (for everyone)
@@ -149,7 +139,6 @@ export const deleteMessageForEveryone = async (messageId: string, userId: string
 
     return { success: true };
 };
-
 
 
 //           5. Delete Message (for me)

@@ -21,7 +21,7 @@ import { logout } from "@/redux/slices/authSlice";
 
 
 type UserType = {
-  name: string;
+  username: string
   email: string;
   bio: string;
   avatar: string;
@@ -161,7 +161,7 @@ export default function ProfilePage() {
                 </button>
               </div>
 
-              <h2 className="text-2xl font-semibold text-white tracking-tight">{user.name}</h2>
+              <h2 className="text-2xl font-semibold text-white tracking-tight">{user.username}</h2>
               <p className="text-gray-400 mt-2 text-sm leading-relaxed px-4 line-clamp-3">
                 {user.bio || "No bio added yet. Tell the world who you are."}
               </p>
@@ -176,7 +176,6 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
 
           <div className="lg:col-span-8 space-y-6">
 
@@ -198,7 +197,7 @@ export default function ProfilePage() {
                   <label className="text-[10px] uppercase tracking-tighter text-gray-500 font-bold">Display Name</label>
                   <div className="flex items-center gap-3 text-gray-200 bg-white/5 p-3 rounded-xl border border-white/5">
                     <User size={16} className="text-gray-500" />
-                    <span>{user.name}</span>
+                    <span>{user.username}</span>
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -210,8 +209,6 @@ export default function ProfilePage() {
                 </div>
               </div>
             </section>
-
-
 
             <section className="bg-white/[0.03] border border-white/10 backdrop-blur-md p-8 rounded-3xl">
               <div className="flex items-center gap-3 mb-6">
@@ -242,13 +239,11 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 </button>
-
               </div>
             </section>
 
           </div>
         </div>
-
       </div>
     </div>
   );

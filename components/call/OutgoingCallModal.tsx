@@ -1,15 +1,11 @@
 "use client";
 import Image from "next/image";
 import { PhoneOff, Phone, Video } from "lucide-react";
+import { User } from '@/types/call'
 
 interface OutgoingCallModalProps {
   open: boolean;
-  receiver: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-
+  receiver:User;
   callType: "audio" | "video";
   status?: "calling" | "ringing" | "connected";
   onCancel: () => void;
@@ -31,7 +27,7 @@ export default function OutgoingCallModal({
         <div className="relative mx-auto w-fit">
           <Image
             src={receiver.avatar || "/public/person2.png"}
-            alt={receiver.name}
+            alt={receiver.username}
             width={120}
             height={120}
             className="rounded-full object-cover border-4 border-zinc-700"
@@ -43,44 +39,26 @@ export default function OutgoingCallModal({
 
         </div>
 
-        <h2 className="mt-6 text-2xl font-semibold text-white">
-          {receiver.name}
-        </h2>
-
+        <h2 className="mt-6 text-2xl font-semibold text-white">  {receiver.username} </h2>
         <div className="mt-3 flex justify-center items-center gap-2 text-zinc-400">
 
-          {callType === "video" ? (
-            <Video size={18}/>
-          ) : (
-            <Phone size={18}/>
-          )}
-
+          {callType === "video" ? ( <Video size={18}/> ) : (  <Phone size={18}/>)}
           <span className="capitalize">
-            {status === "connected"
-              ? "Connected"
-              : "Calling..."
-            }
+            {status === "connected" ? "Connected" : "Calling..."}
           </span>
-
         </div>
 
-     
         {status !== "connected" && (
           <button
             onClick={onCancel}
             className="mx-auto mt-10 flex h-16 w-16 items-center justify-center rounded-full bg-red-600 hover:bg-red-700 transition"
           >
-            <PhoneOff 
-              size={28}
-              className="text-white"
-            />
+            <PhoneOff  size={28} className="text-white" />
           </button>
         )}
 
         {status === "connected" && (
-          <p className="mt-8 text-sm text-emerald-500">
-            Call connected
-          </p>
+          <p className="mt-8 text-sm text-emerald-500"> Call connected </p>
         )}
       </div>
     </div>

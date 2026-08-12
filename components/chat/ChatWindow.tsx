@@ -61,9 +61,6 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
         };              
     }, [chatId]);
 
-
-
-
     useEffect(() => {
         const receiveMessage = (message: Message & { tempId?: string }) => {
             setMessages((prev) => {

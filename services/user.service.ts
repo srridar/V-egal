@@ -15,11 +15,17 @@ export const getAllUsers = async (): Promise<UserResponse> => {
     .sort({ createdAt: -1 })
     .lean();
 
+  const formattedUsers = users.map((user) => ({
+    ...user,
+    id: user._id.toString(),
+    _id: undefined,
+  }));
+
   return {
     success: true,
     status: 200,
     message: "Users fetched successfully",
-    users,
+    users: formattedUsers,
   };
 };
 

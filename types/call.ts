@@ -15,24 +15,18 @@ export type CallStatus =
 
 export interface User {
   id: string;
-  name: string;
+  username: string;
   avatar?: string;
+  friendList?: string[];
 }
+
 
 export type CallType = "audio" | "video";
 
 export interface StartCallParams {
   chatId: string;
-  caller: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  receiver: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
+  caller: User;
+  receiver: User;
 }
 
 export interface IncomingCall {

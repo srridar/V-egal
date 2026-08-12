@@ -28,10 +28,8 @@ export default function EditProfilePage() {
 
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
-
     const [user, setUser] = useState<UserType | null>(null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
-
 
     useEffect(() => {
       
@@ -62,14 +60,8 @@ export default function EditProfilePage() {
 
     const handleImageChange = (file: File) => {
         setAvatarFile(file);
-
         setUser((prev) =>
-            prev
-                ? {
-                    ...prev,
-                    avatar: URL.createObjectURL(file),
-                }
-                : prev
+            prev ? {  ...prev, avatar: URL.createObjectURL(file) } : prev
         );
     };
 
@@ -80,7 +72,7 @@ export default function EditProfilePage() {
         try {
             setLoading(true);
             const form = new FormData();
-            if (user?.username) form.append("name", user.username);
+            if (user?.username) form.append("username", user.username);
             if (user?.bio) form.append("bio", user.bio);
             if (avatarFile) {
                 form.append("avatar", avatarFile);
@@ -90,7 +82,6 @@ export default function EditProfilePage() {
             const data = await res.json();
 
             if (!res.ok) throw new Error(data.message);
-
             if (res.ok) {
                 router.push(`/profile`)
             }
@@ -106,15 +97,10 @@ export default function EditProfilePage() {
     if (initialLoading || !user) {
         return (
             <div className="h-screen flex flex-col items-center justify-center text-white gap-4">
-
-                {/* Spinner */}
                 <div className="w-10 h-10 border-4 border-white/20 border-t-blue-500 rounded-full animate-spin" />
-
-                {/* Text */}
                 <p className="text-sm text-slate-400 tracking-wide">
                     Loading profile...
                 </p>
-
             </div>
         );
     }
@@ -122,8 +108,6 @@ export default function EditProfilePage() {
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-sans p-6">
             <div className="max-w-2xl mx-auto">
-
-                {/* Top Navigation */}
                 <div className="flex items-center justify-between mb-10">
                     <button className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -144,10 +128,7 @@ export default function EditProfilePage() {
                 </header>
 
                 <form onSubmit={handleSave} className="space-y-8">
-
-                    {/* Avatar Upload Section */}
                     <section className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md flex flex-col md:flex-row items-center gap-8">
-
                         <div className="relative group">
                             <div className="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-blue-600 to-purple-500">
                                 <Image
@@ -165,10 +146,7 @@ export default function EditProfilePage() {
                                     type="file"
                                     className="hidden"
                                     accept="image/*"
-                                    onChange={(e) =>
-                                        e.target.files?.[0] &&
-                                        handleImageChange(e.target.files[0])
-                                    }
+                                    onChange={(e) => e.target.files?.[0] && handleImageChange(e.target.files[0])}
                                 />
                             </label>
                         </div>
@@ -183,10 +161,7 @@ export default function EditProfilePage() {
                         </div>
                     </section>
 
-                    {/* Form Fields */}
                     <section className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md space-y-6">
-
-                        {/* Name */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
                                 <User size={16} className="text-slate-500" />
@@ -240,21 +215,16 @@ export default function EditProfilePage() {
                         </div>
                     </section>
 
-                    {/* Actions */}
                     <div className="flex items-center justify-end gap-4 pt-4">
 
-                        <button
-                            type="button"
-                            className="px-6 py-3 text-sm font-medium text-slate-400 hover:text-white transition-colors"
-                        >
+                        <button type="button"  className="px-6 py-3 text-sm font-medium text-slate-400 hover:text-white transition-colors">
                             Cancel
                         </button>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex items-center gap-2 px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-semibold rounded-2xl shadow-lg shadow-blue-900/20 transition-all active:scale-95"
-                        >
+                            className="flex items-center gap-2 px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-semibold rounded-2xl shadow-lg shadow-blue-900/20 transition-all active:scale-95" >
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (

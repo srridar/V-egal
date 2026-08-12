@@ -1,6 +1,7 @@
 
 import Friend from "@/models/Friend";
 import mongoose from "mongoose";
+import User from '@/models/User'
 
 export interface UserResponse {
     success: boolean;
@@ -20,7 +21,6 @@ export const getAllFriends = async (userId: string): Promise<UserResponse> => {
         isBlocked: false
     }).populate("user1", "-password -__v").populate("user2", "-password -__v").lean();
 
-
     const users = friends.map((friend) => {
         const friendUser = friend.user1._id.toString() === userId ? friend.user2 : friend.user1;
         return friendUser;
@@ -36,10 +36,10 @@ export const getAllFriends = async (userId: string): Promise<UserResponse> => {
 }
 
 
-
 export const removeFriend = async (currentUserId: string, friendId: string) => {
-    if (!mongoose.Types.ObjectId.isValid(friendId)) {
-        throw new Error("Invalid friend id");
+
+    if (!mongoose.Types.ObjectId.isValid(currentUserId) || !mongoose.Types.ObjectId.isValid(friendId)) {
+        throw new Error("Invalid user id");
     }
 
     const deletedFriend = await Friend.findOneAndDelete({
@@ -62,6 +62,15 @@ export const removeFriend = async (currentUserId: string, friendId: string) => {
             message: "Friendship not found",
         };
     }
+
+    await Promise.all([
+        User.findByIdAndUpdate(currentUserId, {
+            $pull: { friendList: friendId },
+        }),
+        User.findByIdAndUpdate(friendId, {
+            $pull: { friendList: currentUserId },   //  MongoDB's $pull operator removes a matching value from an array.
+        }),
+    ])
 
     return {
         success: true,

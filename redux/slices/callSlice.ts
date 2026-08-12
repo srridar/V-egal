@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type CallType = "audio" | "video";
-
 export type CallStatus = "idel" | "callling" | "ringing" | "connecting" | "connected" | "ended" | "rejected" | "missed";
 
 export interface ICall {
@@ -15,7 +14,6 @@ export interface ICall {
     endedAt?: string;
     duration?: number;
 }
-
 
 
 interface CallState {
@@ -151,9 +149,6 @@ const callSlice = createSlice({
             state.isVideoEnabled = !state.isVideoEnabled;
         },
 
-
-        //  streams 
-
         setLocalStream(state, action: PayloadAction<MediaStream | null>) {
             state.localStream = action.payload;
         },
@@ -161,8 +156,6 @@ const callSlice = createSlice({
         setRemoteStream(state, action: PayloadAction<MediaStream | null>) {
             state.remoteStream = action.payload;
         },
-
-
 
         resetCallState(state) {
             Object.assign(state, initialState);

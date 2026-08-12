@@ -3,17 +3,12 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { CameraOff } from "lucide-react";
+import type { User } from "@/types/call";
 
 interface VideoLocalPreviewProps {
   stream: MediaStream | null;
-
-  user: {
-    name: string;
-    avatar?: string;
-  };
-
+  user: User;
   isCameraOff: boolean;
-
   className?: string;
 }
 
@@ -52,7 +47,7 @@ export default function VideoLocalPreview({
 
           <Image
             src={user.avatar || "/public/person2.png"}
-            alt={user.name}
+            alt={user.username}
             width={60}
             height={60}
             className="rounded-full object-cover"

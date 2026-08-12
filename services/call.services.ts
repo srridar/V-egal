@@ -55,7 +55,6 @@ export const joinCall = async (roomId: string) => {
         call.startTime = new Date();
 
         await call.save();
-
         return call;
     } catch (error: any) {
         console.error("Join call error:", error.message);
@@ -76,21 +75,17 @@ export const endCall = async (roomId: string, endedBy?: string) => {
             throw new Error("Call not found");
         }
 
-        //     Prevent double ending
         if (call.callStatus === "ended") {
             return call;
         }
 
-        //     Set end time
         call.endTime = new Date();
         call.callStatus = "ended";
 
-        // (optional) track who ended call
         if (endedBy) {
             call.endedBy = endedBy;
         }
 
-        //    Calculate duration safely
         if (call.startTime && call.endTime) {
             call.duration = Math.floor(
                 (call.endTime.getTime() - call.startTime.getTime()) / 1000
@@ -113,10 +108,7 @@ export const getCallHistory = async (userId: string) => {
             throw new Error("User ID is required");
         }
 
-        const calls = await Call.find({
-            participants: { $in: [userId] },
-        }) .populate("caller", "name avatar")
-            .populate("participants", "name avatar")
+        const calls = await Call.find({ participants: { $in: [userId] },}).populate("caller", "username avatar").populate("participants", "username avatar")
             .sort({ createdAt: -1 });
 
         return calls;

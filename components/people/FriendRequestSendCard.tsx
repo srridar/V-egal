@@ -10,7 +10,6 @@ import { useState } from "react";
 
 interface FriendRequestCardProps {
     id: string;
-    name: string;
     username: string;
     avatar?: string;
     bio?: string;
@@ -18,8 +17,7 @@ interface FriendRequestCardProps {
 
 }
 
-const FriendRequestSendCard = ({ id, name, username, avatar, bio, onSuccess }: FriendRequestCardProps) => {
-
+const FriendRequestSendCard = ({ id, username, avatar, bio, onSuccess }: FriendRequestCardProps) => {
 
     const [cancelled, setCancelled] = useState(false);
 
@@ -43,12 +41,11 @@ const FriendRequestSendCard = ({ id, name, username, avatar, bio, onSuccess }: F
 
     return (
         <div className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 p-4 transition hover:border-zinc-700 hover:bg-zinc-800/50">
-            {/* Left Side */}
             <div className="flex items-center gap-4">
                 <div className="relative">
                     <Image
                         src={avatar || "/person2.png"}
-                        alt={name ? name.charAt(0) : "User"}
+                        alt={username ? username.charAt(0) : "User"}
                         width={36}
                         height={36}
                         className="h-10 w-10 rounded-full object-cover ring-1 ring-zinc-800"
@@ -56,14 +53,8 @@ const FriendRequestSendCard = ({ id, name, username, avatar, bio, onSuccess }: F
                 </div>
 
                 <div>
-                    <h3 className="font-semibold text-white"> {name || username} </h3>
-
-                    {bio && (
-                        <p className="mt-1 max-w-sm truncate text-sm text-zinc-400">
-                            {bio}
-                        </p>
-                    )}
-
+                    <h3 className="font-semibold text-white"> { username} </h3>
+                    {bio && ( <p className="mt-1 max-w-sm truncate text-sm text-zinc-400"> {bio} </p> )}
                 </div>
             </div>
 

@@ -18,13 +18,11 @@ interface ChatHeaderProps {
   chat: {
     _id: string;
     type: "private" | "group";
-
-    name?: string;
+    name: string;
     avatar?: string;
 
     receiver?: {
       _id: string;
-      name: string;
       username?: string;
       avatar?: string;
       isOnline?: boolean;
@@ -47,10 +45,7 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
     }
   };
 
-  const displayName =
-    chat.type === "private"
-      ? chat.receiver?.name || "Unknown User"
-      : chat.name || "Unnamed Group";
+  const displayName = chat.type === "private" ? chat.receiver?.username || "Unknown User" : chat.name || "Unnamed Group";
 
   const displayAvatar =
     chat.type === "private"
@@ -82,12 +77,12 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
       chatId: chat._id,
       caller: {
         id: currentUser.id,
-        name: currentUser.username  || "Unknown User",
+        username: currentUser.username  || "Unknown User",
         avatar: currentUser.avatar,
       },
       receiver: {
         id: chat.receiver._id,
-        name: chat.receiver.username || "Unknown User",
+        username: chat.receiver.username || "Unknown User",
         avatar: chat.receiver.avatar,
       },
     });
@@ -104,12 +99,12 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
       chatId: chat._id,
       caller: {
         id: currentUser.id,
-        name: currentUser.username  || "Unknown User",
+        username: currentUser.username  || "Unknown User",
         avatar: currentUser.avatar,
       },
       receiver: {
         id: chat.receiver._id,
-        name: chat.receiver.username || "Unknown User",
+        username: chat.receiver.username || "Unknown User",
         avatar: chat.receiver.avatar,
       },
     });
@@ -119,8 +114,7 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
   return (
     <header className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-3">
       <div className="flex items-center gap-3">
-        <button
-          onClick={() => router.push("/chat")}
+        <button  onClick={() => router.push("/chat")}
           className="rounded-lg p-2 hover:bg-zinc-800 transition md:hidden"
         >
           <ArrowLeft size={20} />

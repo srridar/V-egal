@@ -22,7 +22,7 @@ export default function ChatSidebar() {
 
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const router = useRouter();
- 
+
 
   const handleUserClick = async (receiverId: string) => {
     try {
@@ -59,6 +59,7 @@ export default function ChatSidebar() {
   const fetchAllUsers = async () => {
     try {
       const res = await fetch("/api/allusers");
+      console.log(" all users are " + res.body);
       const data = await res.json();
       if (res.ok) {
         setAllUsers(data?.users || []);
@@ -146,7 +147,7 @@ export default function ChatSidebar() {
   }
 
   const filteredUsers = dataSource.filter((user) =>
-    user.name?.toLowerCase().includes(search.toLowerCase())
+    user.username?.toLowerCase().includes(search.toLowerCase())
   );
 
   const visibleUsers = filteredUsers.filter(
@@ -154,14 +155,12 @@ export default function ChatSidebar() {
   );
 
   const isFriend = (userId: string) => {
-    return friends.some(friend => friend.id === userId);
+    return me?.friendList?.includes(userId) ?? false;
   };
-
   return (
     <div className="w-full h-screen bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col">
-      {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <h1 className="text-xl font-semibold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+        <h1 className="text-xl font-semibold bg-linear-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
           Chats
         </h1>
 
@@ -217,16 +216,6 @@ export default function ChatSidebar() {
           >
             Friends
           </button>
-
-          <button
-            onClick={() => setFilter("chat")}
-            className={`px-4 py-1.5 rounded-full text-sm transition ${filter === "chat"
-              ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
-              : "text-gray-300 hover:bg-white/10"
-              }`}
-          >
-            Chats
-          </button>
         </div>
       </div>
 
@@ -243,7 +232,7 @@ export default function ChatSidebar() {
               <div className="relative">
                 <Image
                   src={user.avatar || "/person.png"}
-                  alt={user.name || "User Avatar"}
+                  alt={user.username || "User Avatar"}
                   width={56}
                   height={56}
                   className="h-14 w-14 rounded-full object-cover ring-1 ring-zinc-800"
@@ -253,17 +242,17 @@ export default function ChatSidebar() {
               {/* Info */}
               <div className="flex-1">
                 <h2 className="text-sm font-semibold text-white">
-                  {user.name}
+                  {user.username}
                 </h2>
               </div>
 
               <div className="flex gap-1">
                 {isFriend(user.id) ? (
-                  <Button  className="font-mono bg-violet-700"  onClick={() => messageHandler(user?.id)}>
+                  <Button className="font-mono bg-violet-700" onClick={() => messageHandler(user?.id)}>
                     Chat
                   </Button>
                 ) : (
-                  <Button  className="font-mono bg-blue-500"  onClick={() => handleAddFrined(user?.id)}>
+                  <Button className="font-mono bg-blue-500" onClick={() => handleAddFrined(user?.id)}>
                     Add Friend
                   </Button>
                 )}

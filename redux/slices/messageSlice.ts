@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 
 export type MessageType = | "text" | "image" | "video" | "audio" | "file";
-
 export type MessageStatus = | "sending" | "sent" | "delivered" | "seen"; 
 
 export interface IMessage {
@@ -52,7 +51,6 @@ const messageSlice = createSlice({
   reducers: {
   
     // Loading
-
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },
@@ -62,7 +60,6 @@ const messageSlice = createSlice({
     },
 
     // Error
-
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
     },
@@ -72,7 +69,6 @@ const messageSlice = createSlice({
     },
 
     // Messages
-    
     setMessages(state, action: PayloadAction<IMessage[]>) {
       state.messages = action.payload;
     },
@@ -106,14 +102,12 @@ const messageSlice = createSlice({
     },
 
     // Selected Message
-
     setSelectedMessage(state, action: PayloadAction<IMessage | null> ) {
       state.selectedMessage = action.payload;
     },
 
   
     // Reply
-
     setReplyMessage(state,  action: PayloadAction<IMessage | null>) {
       state.replyMessage = action.payload;
     },
@@ -123,7 +117,6 @@ const messageSlice = createSlice({
     },
   
     // Edit
-
     setEditMessage(  state,  action: PayloadAction<IMessage | null> ) {
       state.editMessage = action.payload;
     },
@@ -133,7 +126,6 @@ const messageSlice = createSlice({
     },
 
     // Message Status
-
     updateMessageStatus( state,action: PayloadAction<{ messageId: string; status: MessageStatus;}>  ) {
       const message = state.messages.find((msg) => msg._id === action.payload.messageId);
 
@@ -143,7 +135,6 @@ const messageSlice = createSlice({
     },
 
     // Pagination
-
     setPage(state, action: PayloadAction<number>) {
       state.page = action.payload;
     },
@@ -153,7 +144,6 @@ const messageSlice = createSlice({
     },
 
     // Reset
-  
     resetMessages(state) {
       state.messages = [];
       state.selectedMessage = null;

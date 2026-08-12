@@ -1,11 +1,9 @@
 "use client";
 import { useState } from "react";
 
-
 type Props = {
     onFileSelect: (file: File) => void;
 };
-
 
 export default function FileUploader({ onFileSelect }: Props) {
     const [preview, setPreview] = useState<string | null>(null);

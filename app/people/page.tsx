@@ -42,6 +42,7 @@ export default function PeoplePage() {
 
   const fetchAllUser = async () => {
     try {
+      console.log("hitted fetchAllUser ------------")
       const res = await fetch("/api/allusers");
       const data = await res.json();
       if (res.ok) {
@@ -54,6 +55,7 @@ export default function PeoplePage() {
 
   const fetchFriends = async () => {
     try {
+      console.log("hitted fetchFriends ---------------------")
       const res = await fetch("/api/friends");
       const data = await res.json();
 
@@ -67,6 +69,7 @@ export default function PeoplePage() {
 
   const fetchFriendRequests = async () => {
     try {
+      console.log("hitted fetch friend requests-------------");
       const res = await fetch("/api/friendReq/getall");
       const data = await res.json();
 
@@ -163,7 +166,6 @@ export default function PeoplePage() {
                   <UserCard
                     key={user._id}
                     id={user._id}
-                    name={user.name}
                     username={user.username}
                     avatar={user.avatar}
                     bio={user.bio}
@@ -189,7 +191,6 @@ export default function PeoplePage() {
                   <FriendCard
                     key={friend._id}
                     id={friend._id}
-                    name={friend.name}
                     username={friend.username}
                     avatar={friend.avatar}
                     bio={friend.bio}
@@ -214,7 +215,6 @@ export default function PeoplePage() {
                   <FriendRequestCard
                     key={request.requestId}
                     id={request.requestId}
-                    name={request.user.name}
                     username={request.user.username}
                     avatar={request.user.avatar}
                     onSuccess={refreshData}
@@ -237,7 +237,6 @@ export default function PeoplePage() {
                   <FriendRequestSendCard
                     key={request.requestId}
                     id={request.requestId}
-                    name={request.user.name}
                     username={request.user.username}
                     avatar={request.user.avatar}
                     bio={request.user.bio}

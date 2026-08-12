@@ -18,7 +18,6 @@ type UserStatus = "none" | "pending" | "received" | "friend";
 
 interface UserCardProps {
   id: string;
-  name: string;
   username: string;
   avatar?: string;
   bio?: string;
@@ -29,7 +28,6 @@ interface UserCardProps {
 
 const UserCard = ({
   id,
-  name,
   username,
   avatar,
   bio,
@@ -39,7 +37,6 @@ const UserCard = ({
 }: UserCardProps) => {
 
   const router = useRouter();
-
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const isCurrentUser = currentUser?.id === id;
 
@@ -60,7 +57,6 @@ const UserCard = ({
     } catch (error) {
       console.error(error);
       toast.error("Failed to sent friend request")
-
     }
   }
 
@@ -68,7 +64,6 @@ const UserCard = ({
   const handleAcceptFriendReq = async (requestId: string) => {
     try {
       const data = await acceptFriendRequest(requestId);
-      console.log(data);
       onSuccess?.();  // Refresh parent
     } catch (error) {
       console.error(error);
@@ -79,7 +74,6 @@ const UserCard = ({
   const handleRejectFriendReq = async (requestId: string) => {
     try {
       const data = await rejectFriendRequest(requestId);
-      console.log(data);
       onSuccess?.();  // Refresh parent
     } catch (error) {
       console.error(error);
@@ -90,7 +84,6 @@ const UserCard = ({
   const viewProfile = (id: string) => {
     router.push(`profile/${id}`)          // we need to give the other freind profile routing 
   }
-
 
   const messageHandler = async () => {
     try {
@@ -105,7 +98,6 @@ const UserCard = ({
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.message);
       }
@@ -123,20 +115,17 @@ const UserCard = ({
         <div className="relative">
           <Image
             src={avatar || "/person2.png"}
-            alt={name ? name.charAt(0) : "User"}
+            alt={username ? username.charAt(0) : "User"}
             width={36}
             height={36}
             className="h-10 w-10 rounded-full object-cover ring-1 ring-zinc-800"
           />
-
-          <span
-            className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-zinc-950 ${isOnline ? "bg-emerald-500" : "bg-zinc-600"
-              }`}
+          <span className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-zinc-950 ${isOnline ? "bg-emerald-500" : "bg-zinc-600"}`}
           />
         </div>
 
         <div>
-          <h3 className="font-semibold text-white">{name || username}</h3>
+          <h3 className="font-semibold text-white">{ username}</h3>
           {bio && (
             <p className="mt-1 max-w-xs truncate text-sm text-zinc-400">
               {bio}
@@ -144,7 +133,6 @@ const UserCard = ({
           )}
         </div>
       </div>
-
 
       {/* Right Side */}
       {!isCurrentUser && (

@@ -34,7 +34,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-
+  friendList: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+  },
   isVerified: {
     type: Boolean,
     default: false,
@@ -77,7 +80,6 @@ const userSchema = new mongoose.Schema({
       default: true,
     },
   },
-
 
 }, { timestamps: true, });
 

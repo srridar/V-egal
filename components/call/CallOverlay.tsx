@@ -43,7 +43,7 @@ export default function CallOverlay() {
     return (
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60">
         <IncomingCallModal
-          callerName={incomingCall.caller.name}
+          callerName={incomingCall.caller.username}
           onAccept={acceptCall}
           onReject={rejectCall}
         />

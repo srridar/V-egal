@@ -1,21 +1,9 @@
 "use client";
 
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
-  Users,
-  UserCheck,
-  UserRoundPlus,
-  Send,
-} from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {  Users,  UserCheck,  UserRoundPlus,  Send} from "lucide-react";
 
-interface FriendTabsProps {
-  value: string;
-  onValueChange: (value: string) => void;
-}
+interface FriendTabsProps { value: string;  onValueChange: (value: string) => void }
 
 const FriendTabs = ({ value, onValueChange }: FriendTabsProps) => {
   return (

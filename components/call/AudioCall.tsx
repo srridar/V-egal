@@ -3,12 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Mic, MicOff, PhoneOff, Volume2, VolumeX } from "lucide-react";
-
-interface User {
-  id: string;
-  name: string;
-  avatar?: string;
-}
+import { User } from '@/types/call'
 
 interface AudioCallProps {
   user: User;
@@ -80,14 +75,14 @@ export default function AudioCall({
 
       <Image
         src={user.avatar || "/default-avatar.png"}
-        alt={user.name}
+        alt={user.username}
         width={140}
         height={140}
         priority
         className="rounded-full border-4 border-zinc-700 object-cover"
       />
 
-      <h2 className="mt-6 text-3xl font-semibold">{user.name}</h2>
+      <h2 className="mt-6 text-3xl font-semibold">{user.username}</h2>
       <p className="mt-2 text-zinc-400 capitalize"> {status} </p>
      
       {status === "connected" && duration && (
