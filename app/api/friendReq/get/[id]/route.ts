@@ -2,10 +2,7 @@ import { NextRequest } from "next/server";
 import { getParticularFriendRequest } from "@/services/friendRequest.services";
 import { isAuthenticated } from "@/lib/authGuard";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET( req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await isAuthenticated(req);
 
@@ -40,7 +37,7 @@ export async function GET(
     return Response.json(
       {
         message: "Request fetched successfully",
-        data: request,
+        request,
       },
       { status: 200 }
     );

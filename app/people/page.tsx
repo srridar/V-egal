@@ -12,28 +12,36 @@ import { IUser } from "@/types/user";
 
 type UserStatus = "friend" | "received" | "pending" | "none";
 
+interface FriendRequest {
+  requestId: string;
+  user: {
+    id: string;
+    username: string;
+    avatar?: string;
+    bio?: string;
+  };
+}
+
 export default function PeoplePage() {
   const [tab, setTab] = useState("users");
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState<IUser[] | null>(null);
   const [friends, setFriends] = useState<IUser[]>([]);
-  const [requests, setRequests] = useState([]);
-  const [requestsSent, setRequestsSent] = useState([])
+  const [requests, setRequests] = useState<FriendRequest[]>([]);
+  const [requestsSent, setRequestsSent] = useState<FriendRequest[]>([]);
+
+
 
   const getUserStatus = (userId: string): UserStatus => {
-
-    // Already friends
-    if (friends.some((f: any) => f._id === userId)) {
+    if (friends.some((friend) => friend.id === userId)) {
       return "friend";
     }
 
-    // Incoming request
-    if (requests.some((r: any) => r.user._id === userId)) {
+    if (requests.some((request) => request.user.id === userId)) {
       return "received";
     }
 
-    // Sent request
-    if (requestsSent.some((r: any) => r.user._id === userId)) {
+    if (requestsSent.some((request) => request.user.id === userId)) {
       return "pending";
     }
 
@@ -42,7 +50,6 @@ export default function PeoplePage() {
 
   const fetchAllUser = async () => {
     try {
-      console.log("hitted fetchAllUser ------------")
       const res = await fetch("/api/allusers");
       const data = await res.json();
       if (res.ok) {
@@ -55,9 +62,11 @@ export default function PeoplePage() {
 
   const fetchFriends = async () => {
     try {
-      console.log("hitted fetchFriends ---------------------")
       const res = await fetch("/api/friends");
       const data = await res.json();
+
+      console.log("FRIENDS API RESPONSE:", data);
+      console.log("FRIENDS:", data.friends);
 
       if (res.ok) {
         setFriends(data.friends || []);
@@ -69,15 +78,16 @@ export default function PeoplePage() {
 
   const fetchFriendRequests = async () => {
     try {
-      console.log("hitted fetch friend requests-------------");
+
       const res = await fetch("/api/friendReq/getall");
       const data = await res.json();
+      console.log(data.requests);
 
       if (!res.ok) {
         throw new Error(data.message);
       }
 
-      setRequests(data.data.requests);
+      setRequests(data?.requests || []);
     } catch (error) {
       console.error("Failed to fetch friend requests:", error);
     }
@@ -92,7 +102,7 @@ export default function PeoplePage() {
         throw new Error(data.message);
       }
 
-      setRequestsSent(data.data.requests);
+      setRequestsSent(data?.requests || []);
     } catch (error) {
       console.error("Failed to fetch friend requests sent by you:", error);
     }
@@ -102,7 +112,7 @@ export default function PeoplePage() {
     if (!users) return [];
 
     return users.filter(
-      (user) => 
+      (user) =>
         user.username?.toLowerCase().includes(search.toLowerCase())
     );
   }, [users, search]);
@@ -126,10 +136,7 @@ export default function PeoplePage() {
       <div className="mx-auto max-w-5xl space-y-6 p-6">
 
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            People
-          </h1>
-
+          <h1 className="text-3xl font-bold tracking-tight"> People </h1>
           <p className="mt-1 text-sm text-gray-400">
             Discover users, manage friends and friend requests.
           </p>
@@ -162,18 +169,25 @@ export default function PeoplePage() {
                   description="Try searching with another keyword."
                 />
               ) : (
-                filteredUsers.map((user: any) => (
-                  <UserCard
-                    key={user._id}
-                    id={user._id}
-                    username={user.username}
-                    avatar={user.avatar}
-                    bio={user.bio}
-                    isOnline={user.isOnline}
-                    status={getUserStatus(user._id)}
-                    onSuccess= {refreshData}
-                  />
-                ))
+                filteredUsers.map((user: any) => {
+                  const sentRequest = requestsSent.find(
+                    (request: any) => request.user.id === user.id
+                  );
+
+                  return (
+                    <UserCard
+                      key={user.id}
+                      id={user.id}
+                      username={user.username}
+                      avatar={user.avatar}
+                      bio={user.bio}
+                      isOnline={user.isOnline}
+                      status={getUserStatus(user.id)}
+                      requestId={sentRequest?.requestId}
+                      onSuccess={refreshData}
+                    />
+                  );
+                })
               )}
             </div>
           )}
@@ -189,8 +203,8 @@ export default function PeoplePage() {
               ) : (
                 friends.map((friend: any) => (
                   <FriendCard
-                    key={friend._id}
-                    id={friend._id}
+                    key={friend.id}
+                    id={friend.id}
                     username={friend.username}
                     avatar={friend.avatar}
                     bio={friend.bio}

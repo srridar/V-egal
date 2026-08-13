@@ -61,7 +61,6 @@ export const AddFriend = async (receiverId: string) => {
         if (!res.ok) {
             throw new Error(data.message || "Failed to send friend request");
         }
-
         return data;
 
     } catch (error) {

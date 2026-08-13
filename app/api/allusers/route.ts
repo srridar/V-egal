@@ -13,7 +13,6 @@ export async function GET(req:NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const allUsers = await getAllUsers();
-    console.log(" __________- "+ JSON.stringify(allUsers));
 
     return NextResponse.json( allUsers, { status: 200 });
   } catch (error) {

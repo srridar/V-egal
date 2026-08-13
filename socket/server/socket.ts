@@ -5,14 +5,15 @@ import { registerSocketEvents } from "./socketEvents";
 let io: Server | null = null;
 
 export const initializeSocket = (server: HttpServer) => {
-
   if (io) {
     return io;
   }
 
+  const allowedOrigins = process.env.CLIENT_URL?.split(",").map((origin) => origin.trim()).filter(Boolean) ?? [];
+
   io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL,
+      origin: allowedOrigins,
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -20,9 +21,9 @@ export const initializeSocket = (server: HttpServer) => {
 
   registerSocketEvents(io);
   console.log("Socket.IO initialized");
+
   return io;
 };
-
 
 export const getIO = () => {
   if (!io) {
@@ -30,3 +31,4 @@ export const getIO = () => {
   }
   return io;
 };
+

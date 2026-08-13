@@ -6,7 +6,8 @@
     "dev": "tsx watch server.ts",
     "build": "next build",
     "start": "NODE_ENV=production node dist/server.js",
-    "lint": "eslint"
+    "lint": "eslint",
+    "socket": "tsx socket-server.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

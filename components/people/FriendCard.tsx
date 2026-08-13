@@ -26,6 +26,7 @@ const FriendCard = ({
 }: FriendCardProps) => {
 
   const router = useRouter();
+  console.log(" the id is : "+ id);
   const handleRemoveFriend = async (friendId: string) => {
     try {
       const data = await removeFriend(friendId);

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getAllFriendRequest } from "@/services/friendRequest.services";
+import { getAllFriendRequestToYou } from "@/services/friendRequest.services";
 import { isAuthenticated } from "@/lib/authGuard";
 
 
@@ -13,12 +13,14 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const requests = await getAllFriendRequest(userId);
+        console.log(" getting all the friend request sent to me -");
+        const requests = await getAllFriendRequestToYou(userId);
+        console.log(requests);
 
         return Response.json(
             {
                 message: "Requests fetched successfully",
-                data: requests,
+                requests,
             },
             { status: 200 }
         );

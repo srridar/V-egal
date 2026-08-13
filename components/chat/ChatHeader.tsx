@@ -125,7 +125,7 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
           className="relative cursor-pointer"
         >
           <Image
-            src={displayAvatar || "/public/person2.png"}
+            src={"/person2.png"}
             alt={displayName}
             width={50}
             height={50}

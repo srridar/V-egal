@@ -1,22 +1,19 @@
-import http from 'http';
-import next from 'next';
-
-import { initializeSocket } from './socket/server/socket';
+import http from "http";
+import next from "next";
 
 const dev = process.env.NODE_ENV !== "production";
+
 const app = next({ dev });
 const handler = app.getRequestHandler();
-const port = 3000;
 
+const port = Number(process.env.PORT) || 3000;
 
 app.prepare().then(() => {
   const server = http.createServer((req, res) => {
     handler(req, res);
   });
 
-  initializeSocket(server);
-
   server.listen(port, () => {
-    console.log(` Server running at http://localhost:${port}`);
+    console.log(`Next.js server running on port ${port}`);
   });
 });

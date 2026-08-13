@@ -74,7 +74,7 @@ export default function VideoCall({
       )}
 
       {/* Local Preview */}
-      <div className="absolute right-5 top-5 h-48 w-36 overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900 shadow-lg">
+      <div className="absolute right-5top-5aspect-videow-40overflow-hiddenrounded-xlborder border-zinc-700 bg-zinc-900 shadow-xl">
 
         {localStream && !isCameraOff ? (
           <video
@@ -88,26 +88,22 @@ export default function VideoCall({
           <div className="flex h-full flex-col items-center justify-center text-white">
 
             <Image
-              src={user.avatar || "/public/person2.png"}
+              src={user.avatar || "/person2.png"}
               alt={user.username}
               width={60}
               height={60}
               className="rounded-full"
             />
-
             <p className="mt-3 text-xs"> Camera Off  </p>
-
           </div>
         )}
 
       </div>
 
-
       <div className="absolute left-6 top-6 text-white">
         <h2 className="text-xl font-semibold">  {user.username} </h2>
         <p className="text-sm capitalize text-zinc-300">  {status} </p>
       </div>
-
 
       <CallControls
         isVideoCall

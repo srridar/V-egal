@@ -23,6 +23,7 @@ interface UserCardProps {
   bio?: string;
   isOnline?: boolean;
   status: UserStatus;
+  requestId?: string;
   onSuccess?: () => void;
 }
 
@@ -33,6 +34,7 @@ const UserCard = ({
   bio,
   isOnline = false,
   status,
+  requestId,
   onSuccess
 }: UserCardProps) => {
 
@@ -40,18 +42,26 @@ const UserCard = ({
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const isCurrentUser = currentUser?.id === id;
 
-  const handleCancelRequest = async (requestId: string) => {
+  const handleCancelRequest = async () => {
+    if (!requestId) {
+      toast.error("Friend request ID is missing");
+      return;
+    }
+
     try {
       const data = await cancleFriendRequest(requestId);
-      console.log(data);
+      toast.success("Friend request cancelled");
+      await onSuccess?.();
     } catch (error) {
       console.error(error);
+      toast.error("Failed to cancel friend request");
     }
-  }
+  };
 
   const handleAddFrined = async (receiverId: string) => {
     try {
       const data = await AddFriend(receiverId);
+      console.log(" data  success : ")
       console.log(data);
       onSuccess?.();  // Refresh parent
     } catch (error) {
@@ -125,7 +135,7 @@ const UserCard = ({
         </div>
 
         <div>
-          <h3 className="font-semibold text-white">{ username}</h3>
+          <h3 className="font-semibold text-white">{username}</h3>
           {bio && (
             <p className="mt-1 max-w-xs truncate text-sm text-zinc-400">
               {bio}
@@ -149,10 +159,10 @@ const UserCard = ({
 
           {status === "pending" && (
             <Button
-              onClick={() => handleCancelRequest(id)}
+              onClick={handleCancelRequest}
               className="border border-zinc-800 text-zinc-500 opacity-80 flex gap-1 items-center"
             >
-              <Clock className=" h-4 w-4" />
+              <Clock className="h-4 w-4" />
               Cancel Request
             </Button>
           )}
@@ -186,7 +196,7 @@ const UserCard = ({
             <div className="flex gap-2">
               <Button
                 onClick={() => handleAcceptFriendReq(id)}
-                className="bg-white text-black hover:bg-zinc-200"
+                className="bg-gray-900 flex items-center text-black "
               >
                 <Check className="mr-2 h-4 w-4" />
                 Accept
@@ -194,7 +204,7 @@ const UserCard = ({
 
               <Button
                 onClick={() => handleRejectFriendReq(id)}
-                className="border border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
+                className="border flex items-center border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
               >
                 <X className="mr-2 h-4 w-4 text-zinc-400" />
                 Reject

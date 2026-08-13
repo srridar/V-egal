@@ -78,7 +78,7 @@ export const acceptFriendRequest = async (requestId: string, userId: string) => 
     try {
         session.startTransaction();
 
-   
+
         if (!mongoose.Types.ObjectId.isValid(requestId) || !mongoose.Types.ObjectId.isValid(userId)) {
             throw new Error("Invalid ID");
         }
@@ -214,50 +214,49 @@ export const cancelFriendRequest = async (requestId: string, userId: string) => 
 };
 
 
-export const getAllFriendRequest = async (userId: string) => {
+
+export const getAllFriendRequestToYou = async (userId: string) => {
     const requests = await FriendRequest.find({
         receiver: userId,
         status: "pending",
-    }).populate("sender", "-password -__v")
+    })
+        .populate("sender", "-password -__v")
         .sort({ createdAt: -1 })
         .lean();
 
-
-    const receivedRequests = requests.map((request: any) => ({
-        requestId: request._id,
+    return requests.map((request: any) => ({
+        requestId: request._id.toString(),
         status: request.status,
         createdAt: request.createdAt,
-        user: request.sender,
+        user: {
+            id: request.sender._id.toString(),
+            username: request.sender.username,
+            avatar: request.sender.avatar,
+            bio: request.sender.bio,
+        },
     }));
-
-    return {
-        success: true,
-        status: 200,
-        message: "Received friend requests fetched successfully",
-        requests: receivedRequests,
-    };
-}
-
-
-export const getSentFriendRequests = async (userId: string) => {
-    const requests = await FriendRequest.find({
-        sender: userId,
-        status: "pending",
-    }).populate("receiver", "-password -__v").sort({ createdAt: -1 }).lean();
-
-    const sentRequests = requests.map((request: any) => ({
-        requestId: request._id,
-        status: request.status,
-        createdAt: request.createdAt,
-        user: request.receiver,
-    }));
-
-    return {
-        success: true,
-        status: 200,
-        message: "Sent friend requests fetched successfully",
-        requests: sentRequests,
-    };
 };
 
 
+
+export const getSentFriendRequestsByYou = async (userId: string) => {
+  const requests = await FriendRequest.find({
+    sender: userId,
+    status: "pending",
+  })
+    .populate("receiver", "-password -__v")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return requests.map((request: any) => ({
+    requestId: request._id.toString(),
+    status: request.status,
+    createdAt: request.createdAt,
+    user: {
+      id: request.receiver._id.toString(),
+      username: request.receiver.username,
+      avatar: request.receiver.avatar,
+      bio: request.receiver.bio,
+    },
+  }));
+};

@@ -150,6 +150,13 @@ export default function ChatSidebar() {
     user.username?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const isMe = (id: string) => {
+    if (currentUser?.id == id) return true;
+    else {
+      return false
+    }
+  }
+
   const visibleUsers = filteredUsers.filter(
     (user) => user.id !== currentUser?.id
   );
@@ -231,7 +238,7 @@ export default function ChatSidebar() {
               {/* Avatar */}
               <div className="relative">
                 <Image
-                  src={user.avatar || "/person.png"}
+                  src={user.avatar || "/person2.png"}
                   alt={user.username || "User Avatar"}
                   width={56}
                   height={56}
@@ -246,17 +253,26 @@ export default function ChatSidebar() {
                 </h2>
               </div>
 
-              <div className="flex gap-1">
-                {isFriend(user.id) ? (
-                  <Button className="font-mono bg-violet-700" onClick={() => messageHandler(user?.id)}>
-                    Chat
-                  </Button>
-                ) : (
-                  <Button className="font-mono bg-blue-500" onClick={() => handleAddFrined(user?.id)}>
-                    Add Friend
-                  </Button>
-                )}
-              </div>
+              {!isMe(user.id) && (
+                <div className="flex gap-1">
+                  {isFriend(user.id) ? (
+                    <Button
+                      className="font-mono bg-violet-700"
+                      onClick={() => messageHandler(user.id)}
+                    >
+                      Chat
+                    </Button>
+                  ) : (
+                    <Button
+                      className="font-mono bg-blue-500"
+                      onClick={() => handleAddFrined(user.id)}
+                    >
+                      Add Friend
+                    </Button>
+                  )}
+                </div>
+              )}
+
             </div>
           ))
         ) : (

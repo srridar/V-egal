@@ -16,14 +16,26 @@ export const getAllFriends = async (userId: string): Promise<UserResponse> => {
     const friends = await Friend.find({
         $or: [
             { user1: userId },
-            { user2: userId }
+            { user2: userId },
         ],
-        isBlocked: false
-    }).populate("user1", "-password -__v").populate("user2", "-password -__v").lean();
+        isBlocked: false,
+    })
+        .populate("user1", "-password -__v")
+        .populate("user2", "-password -__v")
+        .lean();
 
-    const users = friends.map((friend) => {
-        const friendUser = friend.user1._id.toString() === userId ? friend.user2 : friend.user1;
-        return friendUser;
+    const users = friends.map((friend: any) => {
+        const friendUser = friend.user1._id.toString() === userId
+                ? friend.user2
+                : friend.user1;
+
+        return {
+            id: friendUser._id.toString(),
+            username: friendUser.username,
+            avatar: friendUser.avatar,
+            bio: friendUser.bio,
+            isOnline: friendUser.isOnline,
+        };
     });
 
     return {
@@ -32,8 +44,7 @@ export const getAllFriends = async (userId: string): Promise<UserResponse> => {
         message: "Friends fetched successfully",
         friends: users,
     };
-
-}
+};
 
 
 export const removeFriend = async (currentUserId: string, friendId: string) => {
