@@ -23,6 +23,7 @@ export interface SendMessagePayload {
   conversationId: string;
   content: string;
   messageType?: SocketMessageType;
+  tempId?: string;
 }
 
 export interface ReceiveMessagePayload {
