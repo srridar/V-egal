@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
-import { setUser, login, clearError, setLoading, setError } from "@/redux/slices/authSlice";
-import { Toaster, toast } from "sonner";
+import { login, clearError, setLoading, setError } from "@/redux/slices/authSlice";
+import { toast } from "sonner";
 
 export default function LoginPage() {
     const dispatch = useDispatch<AppDispatch>();

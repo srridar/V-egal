@@ -1,49 +1,53 @@
 "use client";
-import { joinRoom, leaveRoom } from "@/socket/client/socket";
-import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
-import { emitEvent } from "@/socket/client/socket";
 import { RootState } from "@/redux/store";
 import MessageBubble from "./MessageBubble";
 import EmptyMessages from "@/components/chat/conversation/EmptyMessages";
-import { onEvent, offEvent } from "@/socket/client/socket";
-import { SOCKET_EVENTS } from "@/socket/socketEvents";
+import { onEvent, offEvent, getSocket } from "@/lib/socket/socket";
+import { joinRoom, leaveRoom, sendMessage } from "@/lib/socket/socketEmitters";
+import { SOCKET_EVENTS } from "@/lib/socket/socketEvents";
 
 interface Message {
     _id: string;
     content: string;
-    sender: {
-        _id: string;
-    };
+    sender: { _id: string };
     createdAt: string;
+    messageType?: "text" | "image" | "video" | "audio" | "file";
+    tempId?: string;
+}
+
+interface ReceiveMessage {
+    conversationId: string;
+    message: {
+        id: string;
+        senderId: string;
+        content: string;
+        messageType: "text" | "image" | "video" | "audio" | "file";
+        createdAt: string;
+    };
+    tempId?: string;
 }
 
 export default function ChatWindow({ chatId }: { chatId: string }) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(true);
-
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
-    const currentUser = useSelector(
-        (state: RootState) => state.auth.user
-    );
+    const currentUser = useSelector((state: RootState) => state.auth.user);
 
     const fetchMessages = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`/api/messages/${chatId}`, {
-                credentials: "include",
-            });
-            const result = await res.json();
-            if (!res.ok) {
-                throw new Error(result.message || "Failed to load messages");
-            }
+            const response = await fetch(`/api/messages/${chatId}`, { credentials: "include" });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Failed to load messages");
             setMessages(result.data ?? []);
-        } catch (err: any) {
-            console.error(err);
-            toast.error(err.message || "Error loading messages");
+        } catch (error) {
+            console.error("Failed to fetch messages:", error);
+            toast.error(error instanceof Error ? error.message : "Error loading messages");
         } finally {
             setLoading(false);
         }
@@ -52,97 +56,108 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
     useEffect(() => {
         if (!chatId) return;
 
-        joinRoom(chatId);
+        const socket = getSocket();
+        if (!socket) {
+            console.warn("ChatWindow: socket is not initialized");
+            return;
+        }
+
+        if (!socket.connected) {
+            console.warn("ChatWindow: socket is not connected");
+            return;
+        }
+
         setMessages([]);
+        joinRoom({ roomId: chatId });
         fetchMessages();
 
         return () => {
-            leaveRoom();
-        };              
+            leaveRoom({ roomId: chatId });
+        };
     }, [chatId]);
 
     useEffect(() => {
-        const receiveMessage = (message: Message & { tempId?: string }) => {
-            setMessages((prev) => {
-                if (message.tempId) {
-                    const exists = prev.find((m) => m._id === message.tempId);
+        const receiveMessage = (payload: ReceiveMessage) => {
+            const incomingMessage: Message = {
+                _id: payload.message.id,
+                content: payload.message.content,
+                sender: { _id: payload.message.senderId },
+                createdAt: payload.message.createdAt,
+                messageType: payload.message.messageType,
+                tempId: payload.tempId,
+            };
 
-                    if (exists) {
-                        return prev.map((m) =>
-                            m._id === message.tempId ? message : m
-                        );
-                    }
+            setMessages((previous) => {
+                if (payload.tempId) {
+                    const exists = previous.some((message) => message._id === payload.tempId);
+                    if (exists) return previous.map((message) => message._id === payload.tempId ? incomingMessage : message);
                 }
 
-                const alreadyExists = prev.some(
-                    (m) => m._id === message._id
-                );
-
-                if (alreadyExists) {
-                    return prev;
-                }
-                return [...prev, message];
+                if (previous.some((message) => message._id === incomingMessage._id)) return previous;
+                return [...previous, incomingMessage];
             });
         };
 
         onEvent(SOCKET_EVENTS.RECEIVE_MESSAGE, receiveMessage);
-        return () => {
-            offEvent(SOCKET_EVENTS.RECEIVE_MESSAGE, receiveMessage);
-        };
+        return () => offEvent(SOCKET_EVENTS.RECEIVE_MESSAGE, receiveMessage);
     }, []);
 
     useEffect(() => {
-
-        const handleMessageError = (error: { message: string }) => {
-            toast.error(error.message);
-        };
+        const handleMessageError = (error: { message: string }) => toast.error(error.message);
 
         onEvent(SOCKET_EVENTS.MESSAGE_ERROR, handleMessageError);
-        return () => {
-            offEvent(SOCKET_EVENTS.MESSAGE_ERROR, handleMessageError);
-        };
-
+        return () => offEvent(SOCKET_EVENTS.MESSAGE_ERROR, handleMessageError);
     }, []);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
+    const handleSend = () => {
+        const content = input.trim();
+        if (!content) return;
 
-    const handleSend = async () => {
-        if (!input.trim()) return;
-        const content = input.trim();;
+        if (!currentUser?.id) {
+            toast.error("You must be logged in to send a message.");
+            return;
+        }
+
+        const socket = getSocket();
+        if (!socket) {
+            toast.error("Connection is not initialized.");
+            return;
+        }
+
+        if (!socket.connected) {
+            toast.error("You are currently offline.");
+            return;
+        }
+
+        const tempId = crypto.randomUUID();
         setInput("");
-
-        const tempId = Date.now().toString();
 
         const optimisticMessage: Message = {
             _id: tempId,
             content,
-            sender: {
-                _id: currentUser!.id || "",
-            },
+            sender: { _id: currentUser.id },
             createdAt: new Date().toISOString(),
+            messageType: "text",
+            tempId,
         };
 
-        setMessages((prev) => [...prev, optimisticMessage]);
+        setMessages((previous) => [...previous, optimisticMessage]);
 
         try {
-            emitEvent(SOCKET_EVENTS.SEND_MESSAGE, {
-                tempId,
-                chatId,
-                senderId: currentUser?.id,
-                content,
-                messageType: "text",
-            });
+            sendMessage({ conversationId: chatId, content, messageType: "text", tempId });
         } catch (error) {
-            setMessages((prev) =>
-                prev.filter((m) => m._id !== tempId)
-            );
+            console.error("Failed to send message:", error);
+            setMessages((previous) => previous.filter((message) => message._id !== tempId));
             setInput(content);
-            toast.error("Failed to send message.");
+            toast.error(error instanceof Error ? error.message : "Failed to send message.");
         }
     };
+
+
 
     if (loading) {
         return (
@@ -169,6 +184,7 @@ export default function ChatWindow({ chatId }: { chatId: string }) {
             </div>
         );
     }
+
 
     return (
         <div className="flex flex-col h-full">

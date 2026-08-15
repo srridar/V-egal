@@ -75,11 +75,7 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    console.log("useEffect fired");
-    console.log("userId:", userId);
-
     if (userId) {
-      console.log("calling fetchUserProfile");
       fetchUserProfile();
     }
   }, [userId]);

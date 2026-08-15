@@ -1,6 +1,6 @@
 import { createContext, useState, useRef, useEffect, useContext } from "react";
 import { CallContextType, User, IncomingCall, CallType, CallStatus } from "@/types/call";
-import { SOCKET_EVENTS } from "@/socket/socketEvents";
+import { SOCKET_EVENTS } from "@/lib/socket/socketEvents";
 import { useSocket } from "@/app/SocketProvider";
 import { StartCallParams } from "@/types/call";
 
