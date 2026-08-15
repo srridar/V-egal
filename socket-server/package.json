@@ -2,8 +2,6 @@
   "name": "v-egal-socket-server",
   "version": "1.0.0",
   "private": true,
-  "description": "V-Egal Socket.IO server",
-  "license": "ISC",
   "type": "commonjs",
   "scripts": {
     "dev": "tsx watch src/server.ts",
